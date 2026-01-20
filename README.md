@@ -1,222 +1,127 @@
-Code used for examples in the FCG4 Edition of Using Graphics Hardware chapter.
+This project uses CMake and vcpkg for managing C++ dependencies. It serves as a simple example to test your build setup before we get into more complicted code.
 
-### Code now relies on VCpkg
+## Building Using CMake Presets
 
-    cmake --preset=default
+We have several CMake Build Presets that are outlined in the CMakePresets.json. Some are for building for Release or Debug mode. Running the default setup is just fine too.
 
+```
+cd <path/to/this source>
+cmake --preset=default
+```
 
+Each preset defines its own build directory and various build variables that are important on that system.
 
-### Prerequisite Libraries
+Then, to build this source, you would
 
-This code uses the libpng, zlib and Boost libraries. These are relatively easy to install on Linux and macos, but will require a little effort on Windows.
+```
+cd buildVCPkg
+cmake --build .
+```
 
-## Building the code on Linux
+Your executables will then be in the build folder. They may be in sub-folders depending on the environment.
 
-On Ubuntu Linux, you can grab the needed libraries with these package installs:
 
-~~~~
-sudo apt-get install libpng-dev libz-dev libboost-all-dev
-~~~~
 
-Then, building should be as simple as
+## Development Environment Setup
 
-~~~~
-mkdir build
-cd build
-cmake ..
-make
-~~~~
+Before you get too deep into this, you will need some tools, depending on your operating system and hardware. To build this, you do need some development tools for C++. The following sections will help with each of your specific environments.  Minimally, you need a terminal, a good C++ editor, a git command line client, and of course a C++ compiler toolchain.
 
-## Building on macos
+### Linux
 
-For the mac, you will certainly need Xcode installed. You can get this from Apple's App Store.
+The following command in Ubuntu (or related) Linux will get you most of what you might
 
-After this, you will want to install Brew [https://brew.sh/](https://brew.sh/).  Brew is a package installer for macos that works well for installing a large variety of external packages and development libraries. With it, you will install 
+```
+sudo apt-get install build-essential cmake git g++
+```
 
-* cmake
-* glew
-* boost
-* libpng
+### macOS
 
-After you install brew, you can install packages with the following command:
+On macOS, you'll will need to get Apple's Xcode development environment and IDE installed. It's on the AppStore.
 
-~~~~
-brew install <packageName>
-~~~~
+After this, you will want to install Brew:
 
-typed at the command line of the Terminal.
+```
+https://brew.sh/
+```
 
-Building the code should be straight forward, but you will need to supply a couple of CMake options on the command line when you run cmake to help it find your PNG libraries correctly and also set the C++ variant you wish to use. The issue is that Apple has older PNG libraries installed that conflict with the more recent libpng I've had you install with brew.  Brew installs its libraries into /usr/local, but unfortunately, the cmake build system locates the header files in Apple's location and the libraries in Brew's location.  When you run your code you will get a conflict between these two libraries stating
+Brew is a package installer for mac os that works well.  You can install pretty much any package with Brew that are available on Linux machines.
 
-~~~~
-libpng warning: Application built with libpng-XXXXX but running with YYYYY
-~~~~
+```
+brew install cmake
+```
 
-To fix this, you will add the following flag when you run cmake to create your build files. This option will force CMake to look in /usr/local for the include files for PNG:
+will get you initially started.
 
-   -DPNG_PNG_INCLUDE_DIR=/usr/local/include
 
-Next, by default, Apple's compiler currently uses an older standard of C++. This code requires a more recent standard, like C++14. So, we'll add this option:
+### Windows
 
-  -DCMAKE_CXX_FLAGS=-std=c++14
+Building on Windows requires installing a few packages:
 
-### Using Makefiles to build on macos
+* Visual Studio Community Edition 2022 (or newer - such as 2026) - this includes Microsoft's C++ compiler
+* CMake https://cmake.org/download/
+* Git Bash https://git-scm.com/downloads - You can use the powershell, but this is a nice Unix terminal for Windows and it comes with git
+* VS Code https://code.visualstudio.com - VSCode is a nice editor for C++
 
-You can use Makefiles to build your program on macos. 
+When you install Microsoft Visual Studio Community Edition, feel free
+to add whatever development languages and frameworks you want, but
+certainly add C++ and the graphics libraries (DirectX, etc...). Once
+the development environments are installed, make sure to setup your
+git SSH keys if you want.
 
-~~~~
-mkdir build
-cd build
-cmake -DCMAKE_CXX_FLAGS=-std=c++14 -DPNG_PNG_INCLUDE_DIR=/usr/local/include ..
-make
-~~~~
 
-### Using Xcode to build on macos
+# vcpkg - Generalized Build Instructions for Windows, macos and Linux
 
-~~~~
-mkdir buildXcode
-cd buildXcode
-cmake -GXcode -DCMAKE_CXX_FLAGS=-std=c++14 -DPNG_PNG_INCLUDE_DIR=/usr/local/include ..
-~~~~
+Once you have some of the items above, it's time to make sure you've got vcpkg ready on your development machine.
 
-This will create an Xcode project, called OpenGL_FCG.xcodeproj.  The name comes from the string used in the top-level CMakeLists.txt PROJECT function.  You can then open this project with Xcode by double clicking on it in the Finder, or even typing
+We support a more generalized build system using vcpkg [https://learn.microsoft.com/en-us/vcpkg/get_started/overview](https://learn.microsoft.com/en-us/vcpkg/get_started/overview) and CMake build presets. Vcpkg is a C++ package manager used to pull the dependencies needed to build this code. When used in this way, the cmake build system will pull the needed requirements and not rely on installed system dependencies (meaning you shouldn't have to install all sorts of things, ideally). This can result in the initial build being a little slower as the required dependencies are pulled and compiled, but it does mean that you do not have to manually install our dependencies.
 
-~~~~
-open OpenGL_FCG.xcodeproj
-~~~~
+## Setting up vcpkg
 
-on the command line.
+To setup vcpkg, you will need to clone the vcpkg repository and setup environment variables that CMake can use to locate your vcpkg install.  More information on vcpkg and specific details for setting it up on different systems (Windows vs. Linux-based systems) can be found here: [https://learn.microsoft.com/en-us/vcpkg/get_started/overview](https://learn.microsoft.com/en-us/vcpkg/get_started/overview). 
 
-### Using CLion to develop on macos
+Determine a location where you want vcpkg installed. It can be in system location for all users or cloned into your own user account. After cloning, be sure to run the bootstrap batch file in the vcpkg folder.
 
-CLion is great for C++ development and provides a nice IDE.  As a student, you can get a free copy of this IDE.  Go to [https://www.jetbrains.com/clion/](https://www.jetbrains.com/clion/) to download it and register as a student. You can use CLion to develop this code.  To do so, download and install CLion. Then, using CLion, open up your project by selecting the folder that contains your top-level CMakeLists.txt file.  When you first run CLion, you'll be given the option to "Open" a project.
+### TLDR; On Windows
 
-Once the project is opened, you will need to add the same CMake options discussed above.  To do so, open up the Preferences dialog:
+Using git-bash, change directories to where you store your development files. Then, clone vcpkg, as shown below:
 
-~~~~
-CLion > Preferences
-~~~~
+```
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+bootstrap-vcpkg.bat
+```
 
-Once that dialog pops-up, select the
+Next, you will need to create the VCPKG_ROOT environment variable to point to the location of the vcpkg local repository on your system. You should also add the vcpkg root to your PATH variable. The following focuses on Windows, but the same ideas are needed on Unix systems and your shell's environment variables. On Windows, the ideal way to do this so that it is permanent is to set the variables using the Windows System Environment Variables panel from Settings. You can get to this by searching for Environment in the Windows menu. You will need something like the following:
 
-~~~~
-Build, Execution, Deployment > CMake
-~~~~
+```
+VCPKG_ROOT = "C:\path\to\vcpkg"
+```
+Then, make sure the VCPKG_ROOT is also in your user Path variable.  You should be able to just add another folder path to the VCPKG_ROOT location.
 
-menu options.  Then, in the "CMake options:" textbox, enter these flags:
+You will need to quit your Powershell (or git-bash) after this and bring up a new window so the PATH variable information gets propoated.
 
-~~~~
--DCMAKE_CXX_FLAGS=-std=c++14 -DPNG_PNG_INCLUDE_DIR=/usr/local/include
-~~~~
 
-Click OK and then build your project.
+### TLDR; On Linux and macOS
 
+Using a terminal, change directories to where you store your development files. Then, clone vcpkg, as shown below:
 
-## Building on Windows 10
+```
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+```
 
-Building on Windows will take a little effort. First, make sure you have development libraries and IDEs installed. The code has been tested with VS 2019 and VS 2022 - those instructions vary a bit as marked below.  I also use Git Bash fairly extensively as my main console on Windows.  You will probably find it useful:
+Next, you will need to create the VCPKG_ROOT environment variable to point to the location of the vcpkg local repository on your system. You should also add the vcpkg root to your PATH variable. On Linux, you will need to determine which shell environment you use.  For bash, you would edit the ~/.bashrc file, and modify the PATH variable a bit, as shown below:
 
-* Git Bash [https://git-scm.com/downloads](https://git-scm.com/downloads)
+```
+export VCPKG_ROOT=/home/willemsn/dev/vcpkg
+export PATH="$PATH":"$VCPKG_ROOT"
+```
 
-#### VS 2022 Environment
+The instructions are similar for macOS. Determine which shell you use (typically zsh), and then add similar lines to the ~/.zprofile file.
 
-* Visual Studio Community Edition 2022
-* CMake version 3.22.1 [https://cmake.org/download/](https://cmake.org/download/)
+Then, when you restart your terminals, you should be able to run the vcpkg program:
+```
+vcpkg
+```
 
-#### VS 2019 Environment
-
-* Visual Studio Community Edition 2019
-* CMake version 3.19 
-
-When you install VS, feel free to add whatever development languages and frameworks you want, but certainly add C++ and the graphics libraries (DirectX, etc...). Once the development environments are installed, make sure to setup your git SSH keys if you want. 
-
-Next, you will need to grab the PNG and ZLib code and build it. After that, you will need to get Boost and GLEW. Luckily there are nice pre-built binaries for these that you can install.
-
-Step 1 - Get zlib and libpng 
-
-You can download Zlib and libpng at the following URLS:
-
-* Zlib - Go to [https://zlib.net/](https://zlib.net/) to grab the ZLIB libraries.
-* PNG - Go to [http://www.libpng.org/pub/png/libpng.html](http://www.libpng.org/pub/png/libpng.html) to grab the PNG libraries.
-
-These libraries use CMake, so you can build them with cmake rather easily. After downloading and extracting the files, bring up your preferred developer Command Prompt (I'd suggest the Visual Studio Developer Command Prompt). Then build each. I've provided instructions below:
-
-### zlib
-
-In the Zlib source directory, issue the following commands. Note that I have built all of this in the past using Visual Studio 2019 Community Edition which I specify with the Cmake Generator "Visual Studio 16 2017".  You can use another version of Visual Studio if you like, and I'd suggest being consistent.  So if buildings with Visual Studio 2022 Community, you'd use the "Visual Studio 17 2022" generator.
-
-~~~~
-mkdir buildWindows
-cd buildWindows
-cmake -G "Visual Studio 17 2022" -DCMAKE_INSTALL_PREFIX="C:\CS4212Libs" ..
-~~~~
-
-You could load this up into Visual Studio if you like (there's a .sln file in te build folder you created), but you can also build it from the Visual Studio Developer Command Prompt using the following command (which I'd recommend since it's fairly easy for these libraries):
-
-~~~~
-cmake --build . --config Release --target install 
-~~~~
-
-That command will build the Release version of zlib and install it in the C:\CS4212Libs folder that was specified in the previous cmake command.
-
-
-### libpng
-
-Next, navigate to the libpng source. Then issue the following commands:
-
-~~~~
-mkdir buildWindows
-cd buildWindows
-cmake -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="C:\CS4212Libs" -DCMAKE_INSTALL_PREFIX="C:\CS4212Libs" ..
-cmake --build . --config Release --target install
-~~~~
-
-### Boost
-
-Finally, you will need to install Boost. You should grab the Precompiled Windows Binaries of Boost from the Boost site https://sourceforge.net/projects/boost/files/boost-binaries/ (Links to an external site). If you download other boost installers you may have to build the entire thing. You will want to grab Boost 1.72.0 and maybe higher. 
-
-Be careful to download the correct installer. Visual Studio 2022's C++ version number is 14.3, and Visual Studio 2019's C++ version number is 14.2 (e.g. Visual Studio 2017's C++ version number is 14.1). You should only need the 64-bit versions. When I compiled with VS 2019, I downloaded boost_1_72_0-msvc-14.2-64.exe. The installer will place this in the C:\local\boost_1_72_0 folder on your machine and cmake knows to look here to locate the files. When using VS 2022, I downloaded the boost_1_78_0-msvc-14.3-64.exe.
-
-### GLEW
-
-You may also need to grab GLEW (OpenGL Extension Wrangler Library) from [http://glew.sourceforge.net/](http://glew.sourceforge.net/).  You are going to want to grab the Windows 32-bit and 64-bit libraries.  Once you you've extracted the ZIP file, copy the includes, libs and DLLs to the appropriate places.  If you are running git Bash, you can use standard Unix commands like this to do the copying:
-
-~~~~
-cp -pr ~/Downloads/glew-2.1.0/include/GL /c/CS4212Libs/include
-cp -pr ~/Downloads/glew-2.1.0/lib/Release/x64/glew32*.lib /c/CS4212Libs/lib
-cp -pr ~/Downloads/glew-2.1.0/bin/Release/x64/glew32.dll /c/CS4212Libs/bin
-~~~~
-
-## Build the Code
-
-You're now ready to build your code on Windows. Navigate to the location where you cloned the repo and following these instructions to generate the Visual Studio solutions file:
-
-~~~~
-mkdir buildWindows
-cd buildWindows
-cmake -G "Visual Studio 17 2022" -DCMAKE_PREFIX_PATH="C:\CS4212Libs" -DCMAKE_INSTALL_PREFIX="C:\CS4212Libs" -DBOOST_LIBRARYDIR="C:\local\boost_1_78_0\lib64-msvc-14.3" ..
-~~~~
-
-At this point, you could open up the Visual Studio Solution file that will be created in that directory and build and edit within Visual Studio if you want.  This file will be called OpenGL_FCG.sln.  You are free to work right in the VS IDE.
-
-Alternatively, you can also build from the command line using cmake to issue the build:
-
-~~~~
-cmake --build . --config Release
-~~~~
-
-If you go this route and do not want to use Visual Studio for editing, you can install emacs, atom, sublime or whichever editors you prefer to use.
-
-### Try out the examples
-
-After it builds, you can try executing the code. Before you do that, you're going to need to copy the DLLs in the C:\CS4212Libs\bin folder to where your executables are located. Alternatively, you can copy the DLLs into the Windows system folders. At some point, we could configure the CMake project to do this for us.  Also, don't forget to make sure that any OpenGL Shading Language files (*.glsl) are also in the appropriate locations.  If all works, you'll be able to see some images, triangles or whatever you're developing!
-
-~~~~
-OpenGL/Release/glfwExample
-~~~~
-
-or
-
-~~~~
-examples/Release/test_pngWrite
-~~~~
