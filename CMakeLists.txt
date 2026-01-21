@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(OpenGL_FCG
+project(cs4212StarterCode
   VERSION 1.0
   LANGUAGES CXX)
 
