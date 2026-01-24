@@ -17,13 +17,9 @@ Framebuffer::Framebuffer(int x, int y)
 
 
 void Framebuffer::clearToColor(vec3 c) {
-  std::vector<vec3> tempVec;
-
- // tempVec = 
   for (auto idx = 0u; idx < fbStorage.size(); idx++) {
     fbStorage[idx] = c;
   }
-
 }
 
 
