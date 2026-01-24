@@ -19,14 +19,15 @@ include(Catch)
 # 
 set(UTESTS 
   utest_Success
-  utest_Failure)
+  utest_Failure
+  utest_vec3)
 
 # 
 # For each of the executables named in ${UTESTS}, compile them into a
 # boost unit test for use by the CMake CTest system.
 # 
 foreach(uexec ${UTESTS})
-  add_executable(${uexec} ${uexec}.cpp)
+  add_executable(${uexec} ${uexec}.cpp "utest_vec3.cpp") 
   target_link_libraries(${uexec} PRIVATE Catch2::Catch2WithMain)
   target_link_libraries(${uexec} PRIVATE cs4212-util)
 

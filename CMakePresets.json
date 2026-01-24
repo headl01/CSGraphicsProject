@@ -31,7 +31,7 @@
       "inherits": "default",
       "environment": {
         "__comment__": "Set VCPKG_ROOT to your local vcpkg installation path",
-        "VCPKG_ROOT": "C:/Users/willemsn/dev/vcpkg"
+        "VCPKG_ROOT": "C:/Users/headl/Documents/vcpkg/vcpkg"
       }
     }
   ]
