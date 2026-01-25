@@ -1,5 +1,8 @@
 #include "Framebuffer.h"
-#include "../vec3/Vec3.h"
+#include "../vec3/vec3.h"
+
+using color = vec3;
+
 
 Framebuffer::Framebuffer() 
 : width(100), height(100), fbStorage(width*height)
@@ -16,11 +19,19 @@ Framebuffer::Framebuffer(int x, int y)
 
 
 
-void Framebuffer::clearToColor(vec3 c) {
+void clearToColor(color c, std::vector<vec3> fbStorage)
+{
   for (auto idx = 0u; idx < fbStorage.size(); idx++) {
     fbStorage[idx] = c;
   }
 }
+
+void clearToGradient(color c1, color c2, std::vector<vec3> fbStorage)
+{
+  for (auto idx = 0u; idx < fbStorage.size(); idx++) {
+    fbStorage[idx] = constLerp(c1, c2, idx/fbStorage.size());
+  }
+} //produces a constant gradient, so it will have kind of a diagonal look
 
 
 

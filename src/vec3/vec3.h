@@ -128,7 +128,7 @@ vec3 clampToOne(vec3 v)
 }
 
 
-inline vec3 clampToN(vec3 v, float n)
+vec3 clampToN(vec3 v, float n)
 {
   for (int i = 0; i < 3; i++) {
     if (v.e[i] < 0) v.e[i] = 0;
@@ -136,3 +136,19 @@ inline vec3 clampToN(vec3 v, float n)
   }
   return v;
 }
+
+
+vec3 constLerp(vec3 c1, vec3 c2, float t) {
+  return (1.0 - t) * c1 + t * c2;
+}
+
+/*
+vec3 columnarLerp(vec3 c1, vec3 c2, float pixel)
+{
+
+}
+
+vec3 rowLerp(vec3 c1, vec3 c2, float pixel)
+{
+}
+*/

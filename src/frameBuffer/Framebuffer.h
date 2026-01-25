@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../vec3/Vec3.h"
+#include "../vec3/vec3.h"
 using color = vec3;
 
 class Framebuffer
@@ -15,6 +15,7 @@ class Framebuffer
 
 		//utility functions
 		void clearToColor(color c);
+        void clearToGradient(color c1, color c2);
 
 		void setPixelColor(int i, int j, color c);
         void setPixelColor(int index, color c);
@@ -34,6 +35,6 @@ class Framebuffer
         void setFbStorage(std::vector<vec3> v);
 
 	private:
-  int width, height;
-  std::vector<vec3> fbStorage;
+		int width, height;
+		std::vector<vec3> fbStorage;
 };
