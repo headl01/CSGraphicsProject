@@ -27,6 +27,7 @@
 
 #include "png++/png.hpp"
 #include "handleGraphicsArgs.h"
+#include "..\src\frameBuffer\FrameBuffer.h"
 
 int main(int argc, char *argv[])
 {

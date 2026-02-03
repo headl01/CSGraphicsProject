@@ -140,6 +140,7 @@ vec3 clampToN(vec3 v, float n)
 
 vec3 constLerp(vec3 c1, vec3 c2, float t) {
   return (1.0 - t) * c1 + t * c2;
+ 
 }
 
 /*
@@ -152,3 +153,7 @@ vec3 rowLerp(vec3 c1, vec3 c2, float pixel)
 {
 }
 */
+
+vec3 toRGB(vec3 v) {
+  return v*255;
+}

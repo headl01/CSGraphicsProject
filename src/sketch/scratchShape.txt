@@ -1,0 +1,14 @@
+class Shape
+{
+    private:
+    bool regularSolid;
+    double rad;
+
+
+    public:
+    
+
+    virtual ~Shape() = default; 
+};
+
+

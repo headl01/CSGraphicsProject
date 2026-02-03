@@ -3,11 +3,11 @@
 #include <cstring>
 #include <random>
 
-#include "../png++/png.hpp"
-#include "../vec3/vec3.h"
-#include "../frameBuffer/Framebuffer.h"
+#include "../src/png++/png.hpp"
+#include "../src/vec3/vec3.h"
+#include "../src/frameBuffer/Framebuffer.h"
 
-#include "../handleGraphicsArgs.h"
+#include "../src/handleGraphicsArgs.h"
 
 int main(int argc, char *argv[])
 {

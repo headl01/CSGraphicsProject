@@ -1,47 +1,40 @@
 #include "Framebuffer.h"
-#include "../vec3/vec3.h"
+#include <string>
 
-using color = vec3;
-
-
-Framebuffer::Framebuffer() 
-: width(100), height(100), fbStorage(width*height)
+Framebuffer::Framebuffer()
+  : width(100), height(100), fbStorage(width * height)
 {
-
 }
 
-Framebuffer::Framebuffer(int x, int y)
-  : width(x), height(y), fbStorage(width*height)
+Framebuffer::Framebuffer(int w, int h)
+  : width(w), height(h), fbStorage(width * height)
 {
-
 }
 
-
-
-
-void clearToColor(color c, std::vector<vec3> fbStorage)
+void Framebuffer::clearToColor(color c)
 {
-  for (auto idx = 0u; idx < fbStorage.size(); idx++) {
+  for (auto idx = 0u; idx < fbStorage.size(); ++idx) {
     fbStorage[idx] = c;
   }
 }
 
-void clearToGradient(color c1, color c2, std::vector<vec3> fbStorage)
+void Framebuffer::clearToGradient(color c0, color c1)
 {
-  for (auto idx = 0u; idx < fbStorage.size(); idx++) {
-    fbStorage[idx] = constLerp(c1, c2, idx/fbStorage.size());
+  for (auto x = 0; x < width; x++) {
+    for (auto y = 0; y < height; y++) {
+
+      float t = y / (float)height;
+
+      // need to loop over and lerp here...
+      color c2 = c0 * (1 - t) + c1 * t;
+
+      int idx = y * width + x;
+      fbStorage[idx] = c2;
+    }
   }
-} //produces a constant gradient, so it will have kind of a diagonal look
+}
 
-
-
-
-
-void setWidth(int w) {};
-int getWidth();
-
-void setHeight(int h);
-int getHeight();
-
-std::vector<vec3> getFbStorage();
-void setFbStorage(std::vector<vec3> v);
+void Framebuffer::exportToPNG(std::string filename)
+{
+  // need to use example code in test_pngWrite.cpp to mesh here with framebuffer data
+}

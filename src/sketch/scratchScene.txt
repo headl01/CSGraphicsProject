@@ -1,0 +1,10 @@
+class scene(){
+	private:
+	std::list<scene_objects> objects;
+	int numOfObj = 0;
+
+	public:
+	(getters and setters)
+	void clearScene();
+
+}
