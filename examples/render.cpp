@@ -3,14 +3,14 @@
 #include <cstring>
 #include <random>
 
-#include "../src/png++/png.hpp"
-#include "../src/vec3/vec3.h"
-#include "../src/frameBuffer/Framebuffer.h"
+#include "vec3/vec3.h"
+#include "Framebuffer.h"
 
-#include "../src/handleGraphicsArgs.h"
+#include "handleGraphicsArgs.h"
 
 int main(int argc, char *argv[])
 {
+#if 0
   sivelab::GraphicsArgs args;
   args.process(argc, argv);
 
@@ -25,5 +25,5 @@ int main(int argc, char *argv[])
     imData[y][x] = png::rgb_pixel(0,0,25);
   }
   imData.write("simpleGradient.png");
-
+#endif
 }

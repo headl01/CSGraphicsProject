@@ -14,14 +14,6 @@ target_link_libraries(test_pngWrite ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 target_link_libraries(test_pngWrite PNG::PNG)
 target_link_libraries(test_pngWrite ZLIB::ZLIB)
 
-add_executable(render
-  render.cpp
-)
-target_link_libraries(test_pngWrite cs4212-util)
-target_link_libraries(test_pngWrite ${Boost_PROGRAM_OPTIONS_LIBRARIES})
-target_link_libraries(test_pngWrite PNG::PNG)
-target_link_libraries(test_pngWrite ZLIB::ZLIB)
-
 add_executable(test_readPNGFile
   test_readPNGFile.cpp
 )
