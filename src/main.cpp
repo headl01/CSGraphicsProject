@@ -63,6 +63,7 @@ int main()
   }
 
   //export to png down here
+  fb.exportToPNG("test.png");
 
   std::clog << "\rDone.                 \n";
 }
