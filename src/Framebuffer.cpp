@@ -1,5 +1,9 @@
-#include "Framebuffer.h"
 #include <string>
+
+// needed for export function
+#include "png++/png.hpp"
+
+#include "Framebuffer.h"
 
 Framebuffer::Framebuffer()
   : width(100), height(100), fbStorage(width * height)
@@ -40,5 +44,15 @@ void Framebuffer::clearToGradient(color c0, color c1)
 
 void Framebuffer::exportToPNG(std::string filename)
 {
-  // need to use example code in test_pngWrite.cpp to mesh here with framebuffer data
+  // need to use example code in test_pngWrite.cpp to mesh here with
+  // framebuffer data
+    int width = 100;
+    int height = 100;
+    
+    png::image<png::rgb_pixel> imData(width, height);
+
+    // ... convert framebuffer to imData
+
+    // write it out
+    imData.write(filename);
 }
