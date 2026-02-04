@@ -11,6 +11,10 @@ Framebuffer::Framebuffer(int w, int h)
 {
 }
 
+void Framebuffer::setPixelColor(int index, color c) {
+  fbStorage[index] = c;
+}
+
 void Framebuffer::clearToColor(color c)
 {
   for (auto idx = 0u; idx < fbStorage.size(); ++idx) {

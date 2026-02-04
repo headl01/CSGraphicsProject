@@ -62,5 +62,7 @@ int main()
     }
   }
 
+  //export to png down here
+
   std::clog << "\rDone.                 \n";
 }
