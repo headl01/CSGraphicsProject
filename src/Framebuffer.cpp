@@ -26,6 +26,19 @@ void Framebuffer::clearToColor(color c)
   }
 }
 
+float Framebuffer::getFbR(int index)
+{
+  return fbStorage[index].e[0];
+};
+float Framebuffer::getFbG(int index)
+{
+  return fbStorage[index].e[1];
+};
+float Framebuffer::getFbB(int index)
+{
+  return fbStorage[index].e[2];
+};
+
 void Framebuffer::clearToGradient(color c0, color c1)
 {
   for (auto x = 0; x < width; x++) {
@@ -46,13 +59,16 @@ void Framebuffer::exportToPNG(std::string filename)
 {
   // need to use example code in test_pngWrite.cpp to mesh here with
   // framebuffer data
-    int width = 100;
-    int height = 100;
+    //int width = 100;
+    //int height = 100;
     
     png::image<png::rgb_pixel> imData(width, height);
+    for (unsigned int idx = 0; idx < imData.get_height() * imData.get_width(); ++idx) {
+      size_t x = idx % width;
+      size_t y = static_cast<size_t>(floor(idx / static_cast<float>(imData.get_width())));
 
-    // ... convert framebuffer to imData
-
-    // write it out
+      // non-checking equivalent of image.set_pixel(x, y, ...);
+      imData[y][x] = png::rgb_pixel(getFbR(idx), getFbG(idx), getFbB(idx));
+    }
     imData.write(filename);
 }

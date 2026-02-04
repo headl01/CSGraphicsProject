@@ -21,6 +21,10 @@ public:
 
   void exportToPNG(std::string filename);
 
+  float getFbR(int index);
+  float getFbG(int index);
+  float getFbB(int index);
+
 private:
   int width, height;
   std::vector<color> fbStorage;

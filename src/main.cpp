@@ -1,7 +1,7 @@
-//#include "color.h"
+//#include "png++/color.h"
 #include "ray.h"
 #include "vec3/vec3.h"
-#include "frameBuffer/Framebuffer.h"
+#include "Framebuffer.h"
 
 #include <iostream>
 
@@ -62,6 +62,7 @@ int main()
     }
   }
 
+  fb.exportToPNG("cameraTest.png");
   //export to png down here
 
   std::clog << "\rDone.                 \n";
