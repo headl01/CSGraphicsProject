@@ -1,23 +1,26 @@
 #pragma once
 
-#include "vec3/vec3.h"
-#include "camera.h"
-
+#include "Camera.h"
 
 class PerspectiveCamera : public Camera
 {
 public:
-  PerspectiveCamera()
-    : Camera(1000, 1000) {}
-  ///PerspectiveCamera(vec3 origin, vec3 viewDir, vec3 focalLength);
+  PerspectiveCamera();
+  PerspectiveCamera(int pixel_nx, int pixel_ny);
 
-  ray generateRay(int i, int j) {
-      //dist from origin modified with the pixel size
+  // you do need this...
+  // PerspectiveCamera( vec3 origin, vec3 viewdir, float focallength, ...)
 
-      float u, v;
+  ray generateRay(int i, int j) override
+  {
+    float u, v;
+    u = l + (r - l) * (i + 0.5) / (float)nx;
+    v = b + (t - b) * (j + 0.5) / (float)ny;
 
-      ray tempRay(pos, -W * focalLength + U * u + V * v);
-
-      return tempRay;
+    ray tempRay(pos, -W * focalLength + U * u + V * v);
+    return tempRay;
   }
+
+private:
+  float l, r, b, t;
 };

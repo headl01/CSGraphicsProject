@@ -27,6 +27,8 @@
 
 #include "png++/png.hpp"
 #include "handleGraphicsArgs.h"
+#include "PerspectiveCamera.h"
+#include "camera.h"
 
 int main(int argc, char *argv[])
 {

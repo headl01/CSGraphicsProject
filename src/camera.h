@@ -1,25 +1,33 @@
 #pragma once
-#include "vec3/Vec3.h";
+
 #include "ray.h"
 
 class Camera
 {
+public:
+  Camera();
+  Camera(int pixel_nx, int pixel_ny);
 
-	public:
-  Camera(int pixel_nx, int pixel_ny) : pos(0,0,0), U(1,0,0), V(0,1,0), W(0,0,1), 
-	  focalLength(1.0), imageplane_width(0.25), imageplane_height(0.25),
-      nx(pixel_nx), ny(pixel_ny){}; //Default camera
+  // camera needs to know pixel image dimensions...
+  // so, you can provide to the Camera constructor or use a default,
+  // or even pass in as an argument to the generateRay function
+  // virtual ray generateRay( int i, int j, int nx, int ny ) = 0;
 
-  virtual ~Camera(); //Destructor
+  virtual ray generateRay(int i, int j) = 0;
 
-  virtual void generateRay(int i, int j, ray &r) = 0;
+protected:
+  vec3 pos;// position of camera
 
-	protected:
-  vec3 U, V, W; //basis unit vectors for orientation
-  vec3 pos;
+  // basis vectors for camera
+  vec3 U, V, W;
 
-  float focalLength; //Also d
+  float l = (-imagePlane_width / 2);
+  float rb = (imagePlane_width / 2);
+  float b = (-imagePlane_height / 2);
+  float t = (imagePlane_height / 2);
 
-  float imageplane_width, imageplane_height;
+  float focalLength;// also sometimes referred to as "d"
+  float imagePlane_width, imagePlane_height;
+
   int nx, ny;
 };
