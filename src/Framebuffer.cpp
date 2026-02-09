@@ -28,15 +28,15 @@ void Framebuffer::clearToColor(color c)
 
 float Framebuffer::getFbR(int index)
 {
-  return fbStorage[index].e[0];
+  return abs( fbStorage[index].e[0]);
 };
 float Framebuffer::getFbG(int index)
 {
-  return fbStorage[index].e[1];
+  return abs( fbStorage[index].e[1]);
 };
 float Framebuffer::getFbB(int index)
 {
-  return fbStorage[index].e[2];
+  return abs( fbStorage[index].e[2]);
 };
 
 void Framebuffer::clearToGradient(color c0, color c1)

@@ -9,23 +9,24 @@
 #include "Framebuffer.h"
 #include "handleGraphicsArgs.h"
 #include "PerspectiveCamera.h"
-//#include "camera.h"
+#include "camera.h"
 
 int main(int argc, char *argv[])
 {
-  
+  int width = 1000;
+  int height = 1000;
   PerspectiveCamera p;
-  Framebuffer fb(1000,800);
+  Framebuffer fb(width,height);
 
-  for (int x = 0; x < 1000; x++) {
-    for (int y = 0; y < 1000; y++) {
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
         ray r = p.generateRay(x, y);
-      fb.setPixelColor(x * 1000 + y, r.direction());
+      fb.setPixelColor(x * width + y, r.direction());
     }
   }
 
 
 
   //fb.clearToGradient(vec3{ 255, 120, 0 }, vec3{ 0, 0, 255 });
-  fb.exportToPNG("test.png");
+  fb.exportToPNG("test1.png");
 }
