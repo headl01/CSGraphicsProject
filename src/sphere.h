@@ -12,6 +12,7 @@ public:
   // Sphere( vec3 c, float r );
 
   bool intersect(const ray &r, float tmin, float &tmax) override;
+  bool hit_sphere(const ray &r);
 
 private:
   vec3 center;

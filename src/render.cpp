@@ -10,6 +10,7 @@
 #include "handleGraphicsArgs.h"
 #include "PerspectiveCamera.h"
 #include "camera.h"
+#include "sphere.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,10 +19,17 @@ int main(int argc, char *argv[])
   PerspectiveCamera p;
   Framebuffer fb(width,height);
 
+  Sphere s;
+
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
         ray r = p.generateRay(x, y);
-      fb.setPixelColor(x * width + y, r.direction());
+
+        if (s.hit_sphere(r)) {
+          fb.setPixelColor(x * width + y, vec3(0, 0, 200));
+        } else {
+          fb.setPixelColor(x * width + y, vec3(200, 0, 200));
+        }
     }
   }
 
