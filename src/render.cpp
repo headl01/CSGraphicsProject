@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
   int width = 1000;
   int height = 1000;
-  PerspectiveCamera p;
+  PerspectiveCamera p(width,height);
   Framebuffer fb(width,height);
 
   Sphere s;
@@ -24,11 +24,12 @@ int main(int argc, char *argv[])
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
         ray r = p.generateRay(x, y);
-
+        /**/
         if (s.hit_sphere(r)) {
-          fb.setPixelColor(x * width + y, vec3(0, 0, 200));
+          fb.setPixelColor(x * width + y, s.ray_color(r));
         } else {
-          fb.setPixelColor(x * width + y, vec3(200, 0, 200));
+          fb.setPixelColor(x * width + y, r.direction());
+
         }
     }
   }
