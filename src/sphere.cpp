@@ -28,7 +28,8 @@ vec3 Sphere::ray_color(const ray &r)
   auto t = hit_sphere(r);
   if (t > 0.0) {
     vec3 N = unit_vector(r.at(t) - center);
-    return 255 * vec3(N.x() + 1,N.y() + 1,N.z() + 1);
+    //N = vec3(0, 0, 1);
+    return 0.5 * vec3(N.x() + 1,N.y() + 1,N.z() + 1);
   }
 
   vec3 unit_direction = unit_vector(r.direction());

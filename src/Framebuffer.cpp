@@ -68,7 +68,7 @@ void Framebuffer::exportToPNG(std::string filename)
       size_t y = static_cast<size_t>(floor(idx / static_cast<float>(imData.get_width())));
 
       // non-checking equivalent of image.set_pixel(x, y, ...);
-      imData[y][x] = png::rgb_pixel(getFbR(idx), getFbG(idx), getFbB(idx));
+      imData[y][x] = png::rgb_pixel(getFbR(idx)*255, getFbG(idx)*255, getFbB(idx)*255);
     }
     imData.write(filename);
 }
