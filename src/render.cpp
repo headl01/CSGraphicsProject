@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
   PerspectiveCamera p(width,height);
   Framebuffer fb(width,height);
 
-  Sphere s;
+  point3(15, 0, -15);
+
+  Sphere s(vec3{ 0.0, 0.0, -15.0 }, 1, vec3{0,0,100});
 
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
@@ -29,7 +31,6 @@ int main(int argc, char *argv[])
           fb.setPixelColor(x * width + y, s.ray_color(r));
         } else {
           fb.setPixelColor(x * width + y, r.direction());
-
         }
     }
   }

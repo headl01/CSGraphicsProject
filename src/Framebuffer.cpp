@@ -57,11 +57,6 @@ void Framebuffer::clearToGradient(color c0, color c1)
 
 void Framebuffer::exportToPNG(std::string filename)
 {
-  // need to use example code in test_pngWrite.cpp to mesh here with
-  // framebuffer data
-    //int width = 100;
-    //int height = 100;
-    
     png::image<png::rgb_pixel> imData(width, height);
     for (unsigned int idx = 0; idx < imData.get_height() * imData.get_width(); ++idx) {
       size_t x = idx % width;

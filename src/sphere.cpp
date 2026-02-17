@@ -1,5 +1,7 @@
 #include "Sphere.h"
 #include "vec3/vec3.h"
+#include <math.h>
+#include <algorithm>
 
 bool Sphere::intersect(const ray &r, float tmin, float &tmax)
 {
@@ -25,14 +27,36 @@ double Sphere::hit_sphere(const ray &r)
 
 vec3 Sphere::ray_color(const ray &r)
 {
-  auto t = hit_sphere(r);
-  if (t > 0.0) {
-    vec3 N = unit_vector(r.at(t) - center);
-    //N = vec3(0, 0, 1);
-    return 0.5 * vec3(N.x() + 1,N.y() + 1,N.z() + 1);
-  }
+  point3(-15, 0, -15);
 
-  vec3 unit_direction = unit_vector(r.direction());
-  auto a = 0.5 * (unit_direction.y() + 1.0);
-  return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+  auto t = hit_sphere(r);
+  if (objectColor != vec3{0,0,0}) {
+    if (t > 0.0) {
+
+        
+        vec3 lightPos = point3(15, 0, 0);
+        vec3 toLight = unit_vector(lightPos - r.at(t));
+        vec3 N = unit_vector(r.at(t) - center);
+        //N = vec3(0, 0, 1);
+        float shader = std::max(0.0, dot(N, toLight));
+
+        return shader * objectColor;
+      }
+
+      vec3 unit_direction = unit_vector(r.direction());
+      auto a = 0.5 * (unit_direction.y() + 1.0);
+      return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+  } //shader if color
+  else {
+    if (t > 0.0) {
+      vec3 N = unit_vector(r.at(t) - center);
+      // N = vec3(0, 0, 1);
+      return 0.5 * vec3(N.x() + 1, N.y() + 1, N.z() + 1);
+    }
+
+    vec3 unit_direction = unit_vector(r.direction());
+    auto a = 0.5 * (unit_direction.y() + 1.0);
+    return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+  } //normal if no object color
+  
 }

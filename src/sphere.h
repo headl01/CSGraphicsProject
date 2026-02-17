@@ -7,6 +7,7 @@ class Sphere : public Shape
 {
 public:
   Sphere() : center(0.0, 0.0, -15.0), radius(1) {}// unit sphere
+  Sphere(vec3 center, float rad, vec3 c) : center(center), radius(rad), objectColor(c) {}
 
   // You'll want
   // Sphere( vec3 c, float r );
@@ -18,4 +19,5 @@ public:
 private:
   vec3 center;
   float radius;
+  vec3 objectColor = vec3{ 0, 0, 0 };
 };
