@@ -3,50 +3,37 @@
 #include <math.h>
 #include <algorithm>
 
+/*
 bool Sphere::intersect(const ray &r, float tmin, float &tmax)
 {
   return true;
   // compute code from slides here
   // return true if hit...
 }
-
-double Sphere::hit_sphere(const ray &r)
-{
-  vec3 oc = center - r.origin();
-  auto a = dot(r.direction(), r.direction());
-  auto b = -2.0 * dot(r.direction(), oc);
-  auto c = dot(oc, oc) - radius * radius;
-  auto discriminant = b * b - 4 * a * c;
-
-  if (discriminant < 0) {
-    return -1.0;
-  } else {
-    return (-b - std::sqrt(discriminant)) / (2.0 * a);
-  }
-}
-
+*/
+/*
 vec3 Sphere::ray_color(const ray &r)
 {
-  point3(-15, 0, -15);
 
-  auto t = hit_sphere(r);
+  hit_record rec;
+  float t;
   if (objectColor != vec3{0,0,0}) {
-    if (t > 0.0) {
+    if (hit(r, 0.001, INFINITY, t)) {
+      vec3 hitPoint = r.at(t);
 
-        
-        vec3 lightPos = point3(15, 0, 0);
-        vec3 toLight = unit_vector(lightPos - r.at(t));
-        vec3 N = unit_vector(r.at(t) - center);
-        //N = vec3(0, 0, 1);
-        float shader = std::max(0.0, dot(N, toLight));
+      vec3 lightPos = point3(-15, 10, 0);
+      vec3 toLight = unit_vector(lightPos - hitPoint);
+      vec3 N = unit_vector(hitPoint - center);
 
-        return shader * objectColor;
-      }
+      return std::max(0.0, dot(N, toLight)) * objectColor;
+    }
 
       vec3 unit_direction = unit_vector(r.direction());
       auto a = 0.5 * (unit_direction.y() + 1.0);
       return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
   } //shader if color
+  */
+  /*
   else {
     if (t > 0.0) {
       vec3 N = unit_vector(r.at(t) - center);
@@ -58,5 +45,5 @@ vec3 Sphere::ray_color(const ray &r)
     auto a = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
   } //normal if no object color
-  
-}
+ 
+} */

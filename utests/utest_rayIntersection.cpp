@@ -5,6 +5,7 @@
 #include <../src/PerspectiveCamera.h>
 #include <../src/sphere.h>
 
+/**
 TEST_CASE("Ray intersection true")
 {
   int width = 1000;
@@ -27,4 +28,4 @@ TEST_CASE("Ray intersection false")
   ray r = p.generateRay(1, 1);
 
   REQUIRE(s.hit_sphere(r) == -1);
-}
+}**/

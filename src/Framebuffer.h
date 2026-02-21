@@ -25,6 +25,8 @@ public:
   float getFbG(int index);
   float getFbB(int index);
 
+  void greyscaleFilter();
+
 private:
   int width, height;
   std::vector<color> fbStorage;

@@ -67,3 +67,10 @@ void Framebuffer::exportToPNG(std::string filename)
     }
     imData.write(filename);
 }
+
+void Framebuffer::greyscaleFilter() {
+    for (int i = 0; i < fbStorage.size(); i++) {
+    float greyscaleVar = (getFbR(i) + getFbG(i) + getFbB(i)) / 3;
+    fbStorage[i] = vec3(greyscaleVar, greyscaleVar, greyscaleVar);
+  }
+}

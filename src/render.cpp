@@ -21,21 +21,16 @@ int main(int argc, char *argv[])
 
   point3(15, 0, -15);
 
-  Sphere s(vec3{ 0.0, 0.0, -15.0 }, 1, vec3{0,0,100});
+  Sphere s(vec3{ 0.0, 0.0, -15.0 }, 1, vec3{0,100,0});
 
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
         ray r = p.generateRay(x, y);
-        /**/
-        if (s.hit_sphere(r)) {
-          fb.setPixelColor(x * width + y, s.ray_color(r));
-        } else {
-          fb.setPixelColor(x * width + y, r.direction());
-        }
+        fb.setPixelColor(x * width + y, s.ray_color(r));
     }
   }
 
-
+  //fb.greyscaleFilter();
 
   //fb.clearToGradient(vec3{ 255, 120, 0 }, vec3{ 0, 0, 255 });
   fb.exportToPNG("test1.png");
