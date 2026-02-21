@@ -9,7 +9,7 @@
 class Sphere : public hittable
 {
 public:
-  Sphere(const point3 &center, double radius, vec3 color) : center(center), radius(std::fmax(0, radius)), objectColor(color) {}
+  Sphere(const point3 &center, double radius, vec3 color, std::string shader) : center(center), radius(std::fmax(0, radius)), objectColor(color), shader(shader) {}
 
   /**
   //funcitons for normal shading
@@ -75,6 +75,7 @@ private:
   point3 center;
   double radius;
   vec3 objectColor = vec3{ 0, 0, 0 };
+  std::string shader;
 };
 
 #endif

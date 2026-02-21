@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
   point3(15, 0, -15);
 
-  Sphere s(vec3{ 0.0, 0.0, -15.0 }, 1, vec3{0,0,100});
+  Sphere s(vec3{ 0.0, 0.0, -15.0 }, 1, vec3{ 0, 0, 100 }, "normal");
 
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
