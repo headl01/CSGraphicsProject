@@ -11,7 +11,7 @@ bool Sphere::intersect(const ray &r, float tmin, float &tmax)
   // return true if hit...
 }
 */
-/*
+
 vec3 Sphere::ray_color(const ray &r)
 {
 
@@ -24,15 +24,18 @@ vec3 Sphere::ray_color(const ray &r)
       vec3 lightPos = point3(-15, 10, 0);
       vec3 toLight = unit_vector(lightPos - hitPoint);
       vec3 N = unit_vector(hitPoint - center);
-
-      return std::max(0.0, dot(N, toLight)) * objectColor;
+      vec3 returnVector = clampToOne((std::max(0.0, dot(N, toLight))*objectColor));
+      if (returnVector == vec3(0, 0, 0)) {
+        return objectColor;
+      }
+      return returnVector;
     }
 
       vec3 unit_direction = unit_vector(r.direction());
       auto a = 0.5 * (unit_direction.y() + 1.0);
       return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
   } //shader if color
-  */
+  
   /*
   else {
     if (t > 0.0) {
@@ -45,5 +48,5 @@ vec3 Sphere::ray_color(const ray &r)
     auto a = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
   } //normal if no object color
- 
-} */
+    */
+} 

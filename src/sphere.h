@@ -11,6 +11,8 @@ class Sphere : public hittable
 public:
   Sphere(const point3 &center, double radius, vec3 color) : center(center), radius(std::fmax(0, radius)), objectColor(color) {}
 
+  /**
+  //funcitons for normal shading
   double hit_sphere(const ray &r)
   {
     vec3 oc = center - r.origin();
@@ -39,6 +41,8 @@ public:
     return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
   }
 
+  //functions for normal shading ^
+  */
   bool hit(const ray &r, float ray_tmin, float ray_tmax, float &t) const override
   {
     vec3 oc = center - r.origin();
@@ -65,7 +69,7 @@ public:
     return true;
   }
 
-  //vec3 ray_color(const ray &r);
+  vec3 ray_color(const ray &r);
 
 private:
   point3 center;
