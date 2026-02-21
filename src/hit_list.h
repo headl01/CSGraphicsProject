@@ -2,6 +2,7 @@
 #define HITTABLE_H
 
 #include "ray.h"
+#include <algorithm>
 
 class hit_record
 {
