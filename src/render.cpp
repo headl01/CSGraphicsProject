@@ -16,7 +16,7 @@
 int main(int argc, char *argv[])
 {
   int width = 1000;
-  int height = 1000;
+  int height = 800;
   PerspectiveCamera p(width, height);
   Framebuffer fb(width, height);
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
       ray r = p.generateRay(x, y);
       for (int i = 0; i < objectList.size(); i++) {
         if (objectList[i].hit(r, 0.001, INFINITY, t)) {
-          fb.setPixelColor(x * width + y, objectList[i].ray_color(r));
+          fb.setPixelColor(y * width + x, objectList[i].ray_color(r));
         } 
       }
     }
