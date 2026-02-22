@@ -11,38 +11,6 @@ class Sphere : public hittable
 public:
   Sphere(const point3 &center, double radius, vec3 color, std::string shader) : center(center), radius(std::fmax(0, radius)), objectColor(color), shader(shader) {}
 
-  /**
-  //funcitons for normal shading
-  double hit_sphere(const ray &r)
-  {
-    vec3 oc = center - r.origin();
-    auto a = dot(r.direction(), r.direction());
-    auto b = -2.0 * dot(r.direction(), oc);
-    auto c = dot(oc, oc) - radius * radius;
-    auto discriminant = b * b - 4 * a * c;
-
-    if (discriminant < 0) {
-      return -1.0;
-    } else {
-      return (-b - std::sqrt(discriminant)) / (2.0 * a);
-    }
-  }
-
-  vec3 ray_color(const ray &r)
-  {
-    auto t = hit_sphere(r);
-    if (t > 0.0) {
-      vec3 N = unit_vector(r.at(t) - center);
-      return 0.5 * vec3(N.x() + 1, N.y() + 1, N.z() + 1);
-    }
-
-    vec3 unit_direction = unit_vector(r.direction());
-    auto a = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
-  }
-
-  //functions for normal shading ^
-  */
   bool hit(const ray &r, float ray_tmin, float ray_tmax, float &t) const override
   {
     vec3 oc = center - r.origin();
