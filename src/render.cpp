@@ -16,7 +16,7 @@
 int main(int argc, char *argv[])
 {
   int width = 1000;
-  int height = 800;
+  int height = 1000;
   PerspectiveCamera p(width, height);
   Framebuffer fb(width, height);
 
@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
 
   point3(15, 0, -15);
 
-  Sphere s(vec3{ 0.0, 0.0, -50.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+  Sphere s(vec3{ 0.0, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
   objectList.push_back(s);
-  Sphere s1(vec3{ 5.0, 0.0, -50.0 }, 1, vec3{ 0, 0, 100 }, "normal");
+  Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "normal");
   objectList.push_back(s1);
-  Sphere s2(vec3{ -5.0, 0.0, -50.0 }, 1, vec3{ 0, 0, 100 }, "Blinn-Phong");
+  Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "Blinn-Phong");
   objectList.push_back(s2);
 
   float t;

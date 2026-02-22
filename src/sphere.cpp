@@ -3,51 +3,10 @@
 #include <math.h>
 #include <algorithm>
 
-/*
-bool Sphere::intersect(const ray &r, float tmin, float &tmax)
-{
-  return true;
-  // compute code from slides here
-  // return true if hit...
-}
-*/
-
-
-//ray_color for Blinn-Phong Shader
-/*
-vec3 Sphere::ray_color(const ray &r)
-{
-
-  float t;
-  if (objectColor != vec3{ 0, 0, 0 }) {
-    if (hit(r, 0.001, INFINITY, t)) {
-      vec3 hitPoint = r.at(t);
-
-      vec3 lightPos = point3(-15, 10, 0);
-      vec3 toLight = unit_vector(lightPos - hitPoint);
-      vec3 N = unit_vector(hitPoint - center);
-      vec3 H = unit_vector(N + toLight);
-      vec3 returnVector = clampToOne((std::pow(dot(N, H), 100) * objectColor));
-      if (returnVector == vec3(0, 0, 0)) {
-        return objectColor;
-      }
-      return returnVector;
-    }
-
-    vec3 unit_direction = unit_vector(r.direction());
-    auto a = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
-  }
-}
-
-*/
-
-
-//Ray_color for lambertain shader
-
 
   vec3 Sphere::ray_color(const ray &r)
 {
+    vec3 lightPos = point3(-25, 10, 0);
     float t;
 
     if (shader == "normal") {
@@ -71,14 +30,11 @@ vec3 Sphere::ray_color(const ray &r)
             if (hit(r, 0.001, INFINITY, t)) {
               vec3 hitPoint = r.at(t);
 
-              vec3 lightPos = point3(-15, 10, 0);
               vec3 toLight = unit_vector(lightPos - hitPoint);
               vec3 N = unit_vector(hitPoint - center);
-              vec3 returnVector = clampToOne((std::max(0.0, dot(N, toLight))*objectColor));
-              if (returnVector == vec3(0, 0, 0)) {
-                return objectColor;
-              }
-              return returnVector;
+              float returnVector = (std::max(0.0, dot(N, toLight)));
+              
+              return vec3{returnVector, returnVector, returnVector}*unit_vector(objectColor);
             }
 
               vec3 unit_direction = unit_vector(r.direction());
@@ -91,7 +47,6 @@ vec3 Sphere::ray_color(const ray &r)
         if (hit(r, 0.001, INFINITY, t)) {
           vec3 hitPoint = r.at(t);
 
-          vec3 lightPos = point3(-15, 10, 0);
           vec3 toLight = unit_vector(lightPos - hitPoint);
           vec3 N = unit_vector(hitPoint - center);
           vec3 H = unit_vector(N + toLight);
