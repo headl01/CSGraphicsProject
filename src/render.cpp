@@ -21,8 +21,12 @@ int main(int argc, char *argv[])
   Framebuffer fb(width, height);
 
   std::vector<Sphere> objectList;
+  std::vector<point3> lights;
 
-  point3(15, 0, -15);
+  point3 l1 = vec3{ 0, 15, 0 };
+  lights.push_back(l1);
+  //point3 l2 = vec3{ 15, -15, 0 };
+  //lights.push_back(l2);
 
   Sphere s(vec3{ 0.0, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
   objectList.push_back(s);
@@ -30,14 +34,19 @@ int main(int argc, char *argv[])
   objectList.push_back(s1);
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "Blinn-Phong");
   objectList.push_back(s2);
+  Sphere s3(vec3{ 0, 0, -10000.0 }, 1000, vec3{ 250, 0, 0 }, "lambertian");
+  objectList.push_back(s3);
+
+  fb.clearToColor(vec3{ 0, 0, 175 });
 
   float t;
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
       ray r = p.generateRay(x, y);
       for (int i = 0; i < objectList.size(); i++) {
-        if (objectList[i].hit(r, 0.001, INFINITY, t)) {
-          fb.setPixelColor(y * width + x, objectList[i].ray_color(r));
+        if (objectList[i].hit(r, 0.001, 10000000, t)) {
+          fb.setPixelColor(y * width + x, objectList[i].ray_color(r, lights));
+          break;
         } 
       }
     }

@@ -5,6 +5,7 @@
 
 #include "hit_list.h"
 #include "vec3/vec3.h"
+#include <vector>
 
 class Sphere : public hittable
 {
@@ -37,7 +38,7 @@ public:
     return true;
   }
 
-  vec3 ray_color(const ray &r);
+  vec3 ray_color(const ray &r, std::vector<point3> lights);
 
 private:
   point3 center;
