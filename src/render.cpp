@@ -47,7 +47,7 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
         }
       }
     }
-    return closestHit.shape->getColor();
+    return closestHit.shape->getColor(r, lights);
   }
 
   // Background color

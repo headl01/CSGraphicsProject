@@ -17,7 +17,7 @@ public:
 
   vec3 ray_color(const ray &r, std::vector<point3> lights, std::vector<Sphere> objectList, int recursions);
 
-  vec3 getColor() const override;
+  vec3 getColor(ray r, std::vector<point3> lights) const override;
 
 private:
   point3 center;

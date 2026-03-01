@@ -1,4 +1,6 @@
 #include "triangle.h"
+#include "vec3/vec3.h"
+#include <vector>
 
 bool Triangle::intersect(const ray &r, float t_min, float &t_max, HitStruct &hit) const
 {
@@ -53,7 +55,7 @@ bool Triangle::intersect(const ray &r, float t_min, float &t_max, HitStruct &hit
   return true;
 }
 
-vec3 Triangle::getColor() const
+vec3 Triangle::getColor(ray r, std::vector<point3> lights) const
 {
   return color;
 }
