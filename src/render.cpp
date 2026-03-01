@@ -15,7 +15,7 @@
 #include "hit_struct.h"
 #include "triangle.h"
 
-vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &shapes)
+vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &shapes, std::vector<point3> lights)
 {
   float t_min = 0.001f;
   float t_max = std::numeric_limits<float>::max();
@@ -37,6 +37,16 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
   }
 
   if (hitAnything) {
+    for (const auto &shape : shapes) {
+      for (int i = 0; i < lights.size(); i++) {
+        vec3 toLight = lights[i] - closestHit.point;
+        ray tempRay(closestHit.point+.0001*closestHit.point, toLight);
+        HitStruct tempHit;
+        if (shape->intersect(tempRay, t_min, t_max, tempHit)) {
+          return vec3(0, 0, 0);
+        }
+      }
+    }
     return closestHit.shape->getColor();
   }
 
@@ -96,7 +106,7 @@ int main(int argc, char *argv[])
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
       ray r = p.generateRay(x, y);
-      fb.setPixelColor(y * width + x, computeRayColor(r, shapes));
+      fb.setPixelColor(y * width + x, computeRayColor(r, shapes, lights));
     }
   }
 
