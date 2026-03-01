@@ -12,6 +12,39 @@
 #include "PerspectiveCamera.h"
 #include "camera.h"
 #include "sphere.h"
+#include "hit_struct.h"
+#include "triangle.h"
+
+vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &shapes)
+{
+  float t_min = 0.001f;
+  float t_max = std::numeric_limits<float>::max();
+
+  HitStruct closestHit;
+  closestHit.t = t_max;
+  bool hitAnything = false;
+
+  // Check intersection with all shapes, find closest
+  for (const auto &shape : shapes) {
+    HitStruct tempHit;
+    if (shape->intersect(r, t_min, t_max, tempHit)) {
+      if (tempHit.t < closestHit.t) {
+        closestHit = tempHit;
+        hitAnything = true;
+        t_max = tempHit.t;
+      }
+    }
+  }
+
+  if (hitAnything) {
+    return closestHit.shape->getColor();
+  }
+
+  // Background color
+  vec3 unit_direction = unit_vector(r.direction());
+  auto a = 0.5 * (unit_direction.y() + 1.0);
+  return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+}
 
 int main(int argc, char *argv[])
 {
@@ -28,14 +61,34 @@ int main(int argc, char *argv[])
   //point3 l2 = vec3{ 15, -15, 0 };
   //lights.push_back(l2);
 
-  Sphere s(vec3{ 0.0, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+   std::vector<std::shared_ptr<Shape>> shapes;
+  // Red Triangle 1
+  shapes.push_back(std::make_shared<Triangle>(
+    vec3(-1.2, -0.2, -7), vec3(0.8, -0.5, -5), vec3(0.9, 0, -5), vec3(1.0, 0.0, 0.0)));
+
+  // Green Triangle 2
+  shapes.push_back(std::make_shared<Triangle>(
+    vec3(0.773205, -0.93923, -7), vec3(0.0330127, 0.94282, -5), vec3(-0.45, 0.779423, -5), vec3(0.0, 1.0, 0.0)));
+
+  // Blue Triangle 3
+  shapes.push_back(std::make_shared<Triangle>(
+    vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
+ 
+  Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+  shapes.push_back(std::make_shared<Sphere>(s1));
+  
+  
+  
+  /**
+  Sphere s(vec3{ 0.0, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
   objectList.push_back(s);
-  Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "normal");
+  
   objectList.push_back(s1);
-  Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "Blinn-Phong");
+  Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
   objectList.push_back(s2);
   Sphere s3(vec3{ 0, 0, -10000.0 }, 1000, vec3{ 250, 0, 0 }, "lambertian");
   objectList.push_back(s3);
+  */
 
   fb.clearToColor(vec3{ 0, 0, 175 });
 
@@ -43,12 +96,7 @@ int main(int argc, char *argv[])
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
       ray r = p.generateRay(x, y);
-      for (int i = 0; i < objectList.size(); i++) {
-        if (objectList[i].hit(r, 0.001, 10000000, t)) {
-          fb.setPixelColor(y * width + x, objectList[i].ray_color(r, lights));
-          break;
-        } 
-      }
+      fb.setPixelColor(y * width + x, computeRayColor(r, shapes));
     }
   }
 

@@ -3,9 +3,9 @@
 #include <math.h>
 #include <algorithm>
 #include <vector>
-
-
-  vec3 Sphere::ray_color(const ray &r, std::vector<point3> lights)
+    
+/*
+  vec3 Sphere::ray_color(const ray &r, std::vector<point3> lights, std::vector<Sphere> objectList, int recursions)
 {
     vec3 lightPos = point3(-25, 10, 0);
     float t;
@@ -58,7 +58,7 @@
 
           vec3 toLight = unit_vector(lightPos - hitPoint);
           vec3 N = unit_vector(hitPoint - center);
-          vec3 V = unit_vector(-r.direction());
+          vec3 V = unit_vector(r.origin()-hitPoint);
           vec3 H = unit_vector(toLight + V);
 
           //Diffuse
@@ -71,7 +71,7 @@
 
           float colorSpec = spec * diff;
 
-          vec3 returnVector = clampToOne( diffuse + specular);
+          vec3 returnVector =clampToOne( clampToOne( diffuse ) + clampToOne(specular));
           return returnVector;
         }
 
@@ -79,6 +79,62 @@
         auto a = 0.5 * (unit_direction.y() + 1.0);
         return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
     } else if (shader == "mirror") {
-        
+      if (hit(r, 0.001, INFINITY, t)) {
+
+        vec3 N = unit_vector(r.at(t) - center);
+
+        vec3 D = unit_vector(r.direction());
+
+        vec3 reflection = D - 2 * dot(D, N) * N;
+
+        ray tempRay(r.at(t) + 0.001 * N, reflection);
+
+        return ray_color(tempRay, lights, objectList, recursions--);
+      }
+    
     }
+}
+*/
+
+vec3 Sphere::getColor() const
+{
+  return objectColor;
+} 
+
+  bool Sphere::intersect(const ray &r, float t_min, float &t_max, HitStruct &hit) const
+{
+  vec3 oc = r.origin() - center;
+
+  float a = dot(r.direction(), r.direction());
+  float b = 2.0f * dot(oc, r.direction());
+  float c = dot(oc, oc) - radius * radius;
+
+  float discriminant = b * b - 4 * a * c;
+
+  if (discriminant < 0) {
+    return false;
+  }
+
+  float sqrt_disc = std::sqrt(discriminant);
+
+  float t1 = (-b - sqrt_disc) / (2.0f * a);
+  float t2 = (-b + sqrt_disc) / (2.0f * a);
+
+  if (t1 > t_min && t1 < t_max) {
+    t_max = t1;
+    hit.t = t1;
+    hit.point = r.at(t1);
+    hit.shape = this;
+    return true;
+  }
+
+  if (t2 > t_min && t2 < t_max) {
+    t_max = t2;
+    hit.t = t2;
+    hit.point = r.at(t2);
+    hit.shape = this;
+    return true;
+  }
+
+  return false;
 }

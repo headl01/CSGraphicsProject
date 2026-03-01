@@ -4,41 +4,20 @@
 #define SPHERE_H
 
 #include "hit_list.h"
+#include "shape.h"
 #include "vec3/vec3.h"
 #include <vector>
 
-class Sphere : public hittable
+class Sphere : public Shape
 {
 public:
   Sphere(const point3 &center, double radius, vec3 color, std::string shader) : center(center), radius(std::fmax(0, radius)), objectColor(color), shader(shader) {}
 
-  bool hit(const ray &r, float ray_tmin, float ray_tmax, float &t) const override
-  {
-    vec3 oc = center - r.origin();
-    auto a = r.direction().length_squared();
-    auto h = dot(r.direction(), oc);
-    auto c = oc.length_squared() - radius * radius;
+  bool intersect(const ray &r, float t_min, float &t_max, HitStruct &hit) const override;
 
-    auto discriminant = h * h - a * c;
-    if (discriminant < 0)
-      return false;
+  vec3 ray_color(const ray &r, std::vector<point3> lights, std::vector<Sphere> objectList, int recursions);
 
-    auto sqrtd = std::sqrt(discriminant);
-
-    // Find the nearest root that lies in the acceptable range.
-    auto root = (h - sqrtd) / a;
-    if (root <= ray_tmin || ray_tmax <= root) {
-      root = (h + sqrtd) / a;
-      if (root <= ray_tmin || ray_tmax <= root)
-        return false;
-    }
-
-    t = root;
-
-    return true;
-  }
-
-  vec3 ray_color(const ray &r, std::vector<point3> lights);
+  vec3 getColor() const override;
 
 private:
   point3 center;
