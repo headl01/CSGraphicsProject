@@ -9,5 +9,5 @@ class Shape
 {
 public:
   virtual bool intersect(const ray &r, float t_min, float &t_max, HitStruct &hit) const = 0;
-  virtual vec3 getColor(ray r, std::vector<point3> lights) const = 0;
+  virtual vec3 getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const = 0;
 };

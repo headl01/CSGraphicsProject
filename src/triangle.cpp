@@ -55,7 +55,7 @@ bool Triangle::intersect(const ray &r, float t_min, float &t_max, HitStruct &hit
   return true;
 }
 
-vec3 Triangle::getColor(ray r, std::vector<point3> lights) const
+vec3 Triangle::getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const
 {
   return color;
 }

@@ -37,17 +37,24 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
   }
 
   if (hitAnything) {
-    for (const auto &shape : shapes) {
-      for (int i = 0; i < lights.size(); i++) {
-        vec3 toLight = lights[i] - closestHit.point;
-        ray tempRay(closestHit.point+.0001*closestHit.point, toLight);
-        HitStruct tempHit;
-        if (shape->intersect(tempRay, t_min, t_max, tempHit)) {
-          return vec3(0, 0, 0);
+    for (int i = 0; i < lights.size(); i++) {
+
+      vec3 toLight = lights[i] - closestHit.point;
+      float lightDist = toLight.length();
+      vec3 lightDir = unit_vector(toLight);
+
+      ray shadowRay(closestHit.point + 0.001 * closestHit.normal, lightDir);
+
+      HitStruct tempHit;
+      for (const auto &shape : shapes) {
+
+        if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
+          return vec3(0, 0, 0);// in shadow
         }
       }
     }
-    return closestHit.shape->getColor(r, lights);
+
+    return closestHit.shape->getColor(r, lights, 5, shapes);
   }
 
   // Background color
@@ -56,45 +63,63 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
   return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
 }
 
+float random_double()
+{
+  return rand() / (RAND_MAX + 1.0);
+}
+
 int main(int argc, char *argv[])
 {
   int width = 1000;
   int height = 1000;
   PerspectiveCamera p(width, height);
   Framebuffer fb(width, height);
+  srand(time(0));
 
   std::vector<Sphere> objectList;
   std::vector<point3> lights;
 
-  point3 l1 = vec3{ 0, 15, 0 };
+  point3 l1 = vec3{ 10, -150, 0 };
   lights.push_back(l1);
+  point3 l2 = vec3{ 0, 0, -300 };
+  //lights.push_back(l2);
   //point3 l2 = vec3{ 15, -15, 0 };
   //lights.push_back(l2);
 
    std::vector<std::shared_ptr<Shape>> shapes;
   // Red Triangle 1
-  shapes.push_back(std::make_shared<Triangle>(
-    vec3(-1.2, -0.2, -7), vec3(0.8, -0.5, -5), vec3(0.9, 0, -5), vec3(1.0, 0.0, 0.0)));
+  //shapes.push_back(std::make_shared<Triangle>(
+    //vec3(-1.2, -0.2, -7), vec3(0.8, -0.5, -5), vec3(0.9, 0, -5), vec3(1.0, 0.0, 0.0)));
 
   // Green Triangle 2
-  shapes.push_back(std::make_shared<Triangle>(
-    vec3(0.773205, -0.93923, -7), vec3(0.0330127, 0.94282, -5), vec3(-0.45, 0.779423, -5), vec3(0.0, 1.0, 0.0)));
+  //shapes.push_back(std::make_shared<Triangle>(
+    //vec3(0.773205, -0.93923, -7), vec3(0.0330127, 0.94282, -5), vec3(-0.45, 0.779423, -5), vec3(0.0, 1.0, 0.0)));
 
   // Blue Triangle 3
-  shapes.push_back(std::make_shared<Triangle>(
-    vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
+  //shapes.push_back(std::make_shared<Triangle>(
+    //vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
  
-  Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
-  shapes.push_back(std::make_shared<Sphere>(s1));
+  Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
+ // shapes.push_back(std::make_shared<Sphere>(s1));
+  Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "Blinn-Phong");
+
+  Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 0, 0, 100 }, "lambertian");
   
-  
-  
+ //shapes.push_back(std::make_shared<Sphere>(s2));
+ shapes.push_back(std::make_shared<Sphere>(s));
+
+ //shapes.push_back(std::make_shared<Sphere>(s3));
+
+ Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "");
+ shapes.push_back(std::make_shared<Sphere>(ground));
+
   /**
-  Sphere s(vec3{ 0.0, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
+  
   objectList.push_back(s);
   
   objectList.push_back(s1);
-  Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+  
   objectList.push_back(s2);
   Sphere s3(vec3{ 0, 0, -10000.0 }, 1000, vec3{ 250, 0, 0 }, "lambertian");
   objectList.push_back(s3);
@@ -110,7 +135,45 @@ int main(int argc, char *argv[])
     }
   }
 
-      
+  //troublesome attempt at anti aliasing...
+  /*
+  int samplessqrd = 3;
+
+  float t;
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+
+      vec3 avgColor(0, 0, 0);
+
+      for (int i = 0; i < samplessqrd; i++) {
+        for (int j = 0; j < samplessqrd; j++) {
+
+          float Xij = (x + (i + random_double()) / samplessqrd) / (width - 1);
+          float Yij = (y + (j + random_double()) / samplessqrd) / (height - 1);
+
+          ray r = p.generateRay(Xij, Yij);
+          avgColor += computeRayColor(r, shapes, lights);
+        }
+      }
+
+      avgColor /= (samplessqrd * samplessqrd);
+
+      // Gamma correction
+      avgColor = vec3(
+        sqrt(avgColor.x()),
+        sqrt(avgColor.y()),
+        sqrt(avgColor.z()));
+
+      avgColor = clampToOne(avgColor);
+
+
+   
+      fb.setPixelColor(y * width + x, avgColor);
+    }
+  }
+
+         */
+
 
 
   //fb.greyscaleFilter();

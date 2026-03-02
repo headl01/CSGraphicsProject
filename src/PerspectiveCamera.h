@@ -6,12 +6,12 @@ class PerspectiveCamera : public Camera
 {
 public:
   PerspectiveCamera();
-  PerspectiveCamera(int pixel_nx, int pixel_ny);
+  PerspectiveCamera(float pixel_nx, float pixel_ny);
 
   // you do need this...
   // PerspectiveCamera( vec3 origin, vec3 viewdir, float focallength, ...)
 
-  ray generateRay(int i, int j) override
+  ray generateRay(float i, float j) override
   {
     float u, v;
     vec3 dir;

@@ -10,7 +10,7 @@ PerspectiveCamera::PerspectiveCamera()
   t = imagePlane_height / 2.0;
 }
 
-PerspectiveCamera::PerspectiveCamera(int pixel_nx, int pixel_ny)
+PerspectiveCamera::PerspectiveCamera(float pixel_nx, float pixel_ny)
   : Camera(pixel_nx, pixel_ny)
 {
   l = -imagePlane_width / 2.0;

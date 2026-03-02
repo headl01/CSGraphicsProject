@@ -96,9 +96,9 @@
 }
 */
 
-vec3 Sphere::getColor(ray r, std::vector<point3> lights) const
+vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const
 {
-  float t;
+
   HitStruct tempHit;
   float t_max = std::numeric_limits<float>::max();
 
@@ -141,7 +141,7 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights) const
       vec3 hitPoint = r.at(tempHit.t);
       vec3 V = unit_vector(-r.direction());
 
-      vec3 N = unit_vector(tempHit.point);
+      vec3 N = unit_vector(tempHit.normal);
       vec3 diffuse, specular;
 
       for (int i = 0; i < lights.size(); i++) {
@@ -161,6 +161,30 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights) const
 
       vec3 returnVector = clampToOne(clampToOne(diffuse) + clampToOne(specular));
       return returnVector;
+    }
+  } else if (shader == "mirror") {
+    for (int i = 0; i < shapes.size(); i++) {
+      if (shapes[i]->intersect(r, 0.001, t_max, tempHit) && recursions > 0) {
+
+        vec3 N = unit_vector((tempHit.point - center) / radius);
+
+        vec3 D = unit_vector(r.direction());
+        if (dot(N, D) > 0) {
+          N = -N;
+        }
+
+
+        vec3 reflection = D - 2 * dot(D, N) * N;
+
+        ray tempRay(tempHit.point + 0.001 * N, reflection);
+
+        return getColor(tempRay, lights, recursions - 1, shapes);
+      }
+    } 
+    {
+      vec3 unit_direction = unit_vector(r.direction());
+      auto a = 0.5 * (unit_direction.y() + 1.0);
+      return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
     }
   }
   return objectColor;
@@ -190,6 +214,15 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights) const
     hit.t = t1;
     hit.point = r.at(t1);
     hit.shape = this;
+
+    vec3 outwardNormal = (hit.point - center) / radius;
+
+    // Make normal face against the ray
+    if (dot(r.direction(), outwardNormal) < 0)
+      hit.normal = outwardNormal;
+    else
+      hit.normal = -outwardNormal;
+
     return true;
   }
 
@@ -198,6 +231,14 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights) const
     hit.t = t2;
     hit.point = r.at(t2);
     hit.shape = this;
+
+    vec3 outwardNormal = (hit.point - center) / radius;
+
+    if (dot(r.direction(), outwardNormal) < 0)
+      hit.normal = outwardNormal;
+    else
+      hit.normal = -outwardNormal;
+
     return true;
   }
 

@@ -6,6 +6,7 @@ class Shape;
 struct HitStruct
 {
   float t;
+  vec3 normal;
   vec3 point;
   const Shape *shape = nullptr;
 };
