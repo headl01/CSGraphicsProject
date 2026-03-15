@@ -52,7 +52,7 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
           return vec3(0, 0, 0);// in shadow
         }
       }
-    }
+    } //loop checks to see if there are any shadow-casting objects between light sources
 
     return closestHit.shape->getColor(r, lights, 5, shapes);
   }
@@ -63,9 +63,11 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
   return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
 }
 
-float random_double()
+float random_float()
 {
-  return rand() / (RAND_MAX + 1.0);
+  float random = rand() / (RAND_MAX + 1.0);
+  //std::cout << random; for debug
+  return random;
 }
 
 int main(int argc, char *argv[])
@@ -79,17 +81,16 @@ int main(int argc, char *argv[])
   std::vector<Sphere> objectList;
   std::vector<point3> lights;
 
-  point3 l1 = vec3{ 10, -150, 0 };
+  point3 l1 = vec3{ 10, 150, 0 };
   //lights.push_back(l1);
-  point3 l2 = vec3{ 0, 0, -300 };
+  //point3 l2 = vec3{ 0, 0, -300 };
   //lights.push_back(l2);
-  //point3 l2 = vec3{ 15, -15, 0 };
-  //lights.push_back(l2);
+  point3 l2 = vec3{ 15, -15, 0 };
+  lights.push_back(l2);
 
    std::vector<std::shared_ptr<Shape>> shapes;
   // Red Triangle 1
-  shapes.push_back(std::make_shared<Triangle>(
-     vec3(30, 0, -500), vec3(800, -5, -500), vec3(9, 10, -500), vec3(1.0, 0.0, 0.0), "lambertian"));
+  //shapes.push_back(std::make_shared<Triangle>(vec3(30, 0, -500), vec3(800, -5, -500), vec3(9, 10, -500), vec3(1.0, 0.0, 0.0), ""));
 
   // Green Triangle 2
   //shapes.push_back(std::make_shared<Triangle>(
@@ -102,21 +103,21 @@ int main(int argc, char *argv[])
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
   //shapes.push_back(std::make_shared<Sphere>(s1));
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "normal");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
 
   Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 0, 0, 100 }, "lambertian");
   
  //shapes.push_back(std::make_shared<Sphere>(s2));
- //shapes.push_back(std::make_shared<Sphere>(s));
+ shapes.push_back(std::make_shared<Sphere>(s));
 
- //shapes.push_back(std::make_shared<Sphere>(s3));
+ shapes.push_back(std::make_shared<Sphere>(s3));
 
- Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "");
- //shapes.push_back(std::make_shared<Sphere>(ground));
+ Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "lambertian");
+ shapes.push_back(std::make_shared<Sphere>(ground));
 
 
   fb.clearToColor(vec3{ 0, 0, 175 });
-
+ /*
   float t;
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
@@ -124,9 +125,9 @@ int main(int argc, char *argv[])
       fb.setPixelColor(y * width + x, computeRayColor(r, shapes, lights));
     }
   }
-
+  */
   //troublesome attempt at anti aliasing...
-  /*
+  
   int samplessqrd = 3;
 
   float t;
@@ -138,31 +139,30 @@ int main(int argc, char *argv[])
       for (int i = 0; i < samplessqrd; i++) {
         for (int j = 0; j < samplessqrd; j++) {
 
-          float Xij = (x + (i + random_double()) / samplessqrd) / (width - 1);
-          float Yij = (y + (j + random_double()) / samplessqrd) / (height - 1);
+          float Xij = (x + (i + random_float()) / samplessqrd) / width;
+          float Yij = (y + (j + random_float()) / samplessqrd) / height;
 
           ray r = p.generateRay(Xij, Yij);
           avgColor += computeRayColor(r, shapes, lights);
         }
       }
 
-      avgColor /= (samplessqrd * samplessqrd);
-
+      avgColor = avgColor/(samplessqrd * samplessqrd);
+      
+      
       // Gamma correction
       avgColor = vec3(
         sqrt(avgColor.x()),
         sqrt(avgColor.y()),
         sqrt(avgColor.z()));
 
-      avgColor = clampToOne(avgColor);
+        avgColor = clampToOne(avgColor);
 
-
-   
-      fb.setPixelColor(y * width + x, avgColor);
+      fb.setPixelColor(x + y * width, avgColor);
     }
   }
 
-         */
+         
 
 
 

@@ -1,4 +1,4 @@
-
+NOTE: pw_refactor is the 'main' branch, I have not yet swapped everything over and merged back
 
 This project is not yet terminal capable, I will attempt to hook up terminal commands using g++ as soon as I can, but I ran into issues with AntiAliasing and the mirror
 shaders that ate up a lot of time. 

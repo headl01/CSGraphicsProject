@@ -15,17 +15,14 @@ public:
   {
     float u, v;
     vec3 dir;
-    u = l + (r - l) * (i + 0.5) / (float)nx;
-    v = b + (t - b) * (j + 0.5) / (float)ny;
+
+    u = l + (r - l) * i;
+    v = b + (t - b) * j;
 
     dir = -W * focalLength + U * u + V * v;
-    dir = (dir / dir.length())*255;
+    dir = dir / dir.length();
 
-    ray tempRay(pos, dir);
-
-    //std::cout << tempRay.direction();
-
-    return tempRay;
+    return ray(pos, dir);
   }
 
 private:
