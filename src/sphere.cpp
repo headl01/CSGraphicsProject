@@ -163,24 +163,18 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       return returnVector;
     }
   } else if (shader == "mirror") {
-    for (int i = 0; i < shapes.size(); i++) {
-      if (shapes[i]->intersect(r, 0.001, t_max, tempHit) && recursions > 0) {
+    if (intersect(r, 0.001, t_max, tempHit) && recursions > 0) {
 
-        vec3 N = unit_vector((tempHit.point - center) / radius);
+      vec3 N = tempHit.normal;
+      vec3 D = unit_vector(r.direction());
 
-        vec3 D = unit_vector(r.direction());
-        if (dot(N, D) > 0) {
-          N = -N;
-        }
+      vec3 reflection = D - 2 * dot(D, N) * N;
 
+      ray tempRay(tempHit.point + 0.001 * N, reflection);
 
-        vec3 reflection = D - 2 * dot(D, N) * N;
-
-        ray tempRay(tempHit.point + 0.001 * N, reflection);
-
-        return getColor(tempRay, lights, recursions - 1, shapes);
-      }
-    } 
+      return getColor(tempRay, lights, recursions - 1, shapes);
+    }
+        
     {
       vec3 unit_direction = unit_vector(r.direction());
       auto a = 0.5 * (unit_direction.y() + 1.0);

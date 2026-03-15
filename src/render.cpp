@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
   std::vector<point3> lights;
 
   point3 l1 = vec3{ 10, -150, 0 };
-  lights.push_back(l1);
+  //lights.push_back(l1);
   point3 l2 = vec3{ 0, 0, -300 };
   //lights.push_back(l2);
   //point3 l2 = vec3{ 15, -15, 0 };
@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
 
    std::vector<std::shared_ptr<Shape>> shapes;
   // Red Triangle 1
-  //shapes.push_back(std::make_shared<Triangle>(
-    //vec3(-1.2, -0.2, -7), vec3(0.8, -0.5, -5), vec3(0.9, 0, -5), vec3(1.0, 0.0, 0.0)));
+  shapes.push_back(std::make_shared<Triangle>(
+     vec3(30, 0, -500), vec3(800, -5, -500), vec3(9, 10, -500), vec3(1.0, 0.0, 0.0), "lambertian"));
 
   // Green Triangle 2
   //shapes.push_back(std::make_shared<Triangle>(
@@ -100,30 +100,20 @@ int main(int argc, char *argv[])
     //vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
  
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
- // shapes.push_back(std::make_shared<Sphere>(s1));
+  //shapes.push_back(std::make_shared<Sphere>(s1));
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "Blinn-Phong");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "normal");
 
   Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 0, 0, 100 }, "lambertian");
   
  //shapes.push_back(std::make_shared<Sphere>(s2));
- shapes.push_back(std::make_shared<Sphere>(s));
+ //shapes.push_back(std::make_shared<Sphere>(s));
 
  //shapes.push_back(std::make_shared<Sphere>(s3));
 
  Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "");
- shapes.push_back(std::make_shared<Sphere>(ground));
+ //shapes.push_back(std::make_shared<Sphere>(ground));
 
-  /**
-  
-  objectList.push_back(s);
-  
-  objectList.push_back(s1);
-  
-  objectList.push_back(s2);
-  Sphere s3(vec3{ 0, 0, -10000.0 }, 1000, vec3{ 250, 0, 0 }, "lambertian");
-  objectList.push_back(s3);
-  */
 
   fb.clearToColor(vec3{ 0, 0, 175 });
 

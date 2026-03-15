@@ -57,5 +57,28 @@ bool Triangle::intersect(const ray &r, float t_min, float &t_max, HitStruct &hit
 
 vec3 Triangle::getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const
 {
+  HitStruct tempHit;
+  float t_max = std::numeric_limits<float>::max();
+    if (shader == "lambertian") {
+    vec3 buildColor = vec3(0, 0, 0);
+
+    if (color != vec3{ 0, 0, 0 }) {
+      if (intersect(r, 0.001, t_max, tempHit)) {
+        vec3 hitPoint = r.at(tempHit.t);
+
+        vec3 N = unit_vector(cross(vertex_b-vertex_a,vertex_c-vertex_a));
+        for (int i = 0; i < lights.size(); i++) {
+          vec3 toLight = unit_vector(lights[i] - hitPoint);
+          float returnVector = (std::max(0.0, dot(-N, toLight)));
+          buildColor = vec3{ color.x() + returnVector, color.y() + returnVector, color.z() + returnVector };
+        }
+        return clampToOne(buildColor * unit_vector(color));
+      }
+
+      vec3 unit_direction = unit_vector(r.direction());
+      auto a = 0.5 * (unit_direction.y() + 1.0);
+      return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+    }
+  }
   return color;
 }

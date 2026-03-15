@@ -1,3 +1,51 @@
+
+
+This project is not yet terminal capable, I will attempt to hook up terminal commands using g++ as soon as I can, but I ran into issues with AntiAliasing and the mirror
+shaders that ate up a lot of time. 
+
+To run this program, eveyrhting is handled inside render.cpp. This is the main driver of the entire program, it holds onto the shape vector and posesses the compute ray 
+function which is necessary to get any color into the .png files. You will see a large block of commented out shape declarations, these are pre-declared objects that can
+be uncommented and then rendered, they were just there for testing and it made more sense to just put them off to the side instead of starting from scratch every time.
+The executable you have to run is render.exe inside the actual VS code. 
+
+Shaders are assigned to every shape in the list and they are processed differnetly depending on which assignment it is given. So far, the shaders supported are,
+	1. 'normal'
+	2. 'lambertian'
+	3. 'Blinn-Phong'
+	4. 'mirror'
+
+Having a shape declaration like this,
+
+ Sphere s(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "");
+
+ Will result in no shader being rendered and the object color to be returned. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Below is the README that came with the project, I will just add my content above this
 This project uses CMake and vcpkg for managing C++ dependencies. It serves as a simple example to test your build setup before we get into more complicted code.
 
 ## Building Using CMake Presets
