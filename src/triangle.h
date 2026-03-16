@@ -12,6 +12,7 @@ public:
 
   bool intersect(const ray &r, float t_min, float &t_max, HitStruct &hit) const override;
   vec3 getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const override;
+  std::string getShader() const override { return shader; };
 
 private:
   vec3 vertex_a, vertex_b, vertex_c;

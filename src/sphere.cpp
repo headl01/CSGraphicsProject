@@ -96,6 +96,55 @@
 }
 */
 
+vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &shapes, std::vector<point3> lights, int recursions) {
+  float t_min = 0.001f;
+  float t_max = std::numeric_limits<float>::max();
+
+  HitStruct closestHit;
+  closestHit.t = t_max;
+  bool hitAnything = false;
+
+  // Check intersection with all shapes, find closest
+  for (const auto &shape : shapes) {
+    HitStruct tempHit;
+    if (shape->intersect(r, t_min, t_max, tempHit)) {
+      if (tempHit.t < closestHit.t) {
+        closestHit = tempHit;
+        hitAnything = true;
+        t_max = tempHit.t;
+      }
+    }
+  }
+
+  if (hitAnything) {
+    for (int i = 0; i < lights.size(); i++) {
+
+      vec3 toLight = lights[i] - closestHit.point;
+      float lightDist = toLight.length();
+      vec3 lightDir = unit_vector(toLight);
+
+      ray shadowRay(closestHit.point + 0.001 * closestHit.normal, lightDir);
+
+      HitStruct tempHit;
+      for (const auto &shape : shapes) {
+
+        if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
+          if (shape->getShader() != "mirror") {
+            return vec3(0, 0, 0);// in shadow
+          }
+        }
+      }
+    }// loop checks to see if there are any shadow-casting objects between light sources
+
+    return closestHit.shape->getColor(r, lights, recursions-1, shapes);
+  }
+
+  // Background color
+  vec3 unit_direction = unit_vector(r.direction());
+  auto a = 0.5 * (unit_direction.y() + 1.0);
+  return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
+}
+
 vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const
 {
 
@@ -163,19 +212,20 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       return returnVector;
     }
   } else if (shader == "mirror") {
+
     if (intersect(r, 0.001, t_max, tempHit) && recursions > 0) {
 
-      vec3 N = tempHit.normal;
+      vec3 N = unit_vector(tempHit.normal);
       vec3 D = unit_vector(r.direction());
 
       vec3 reflection = D - 2 * dot(D, N) * N;
 
       ray tempRay(tempHit.point + 0.001 * N, reflection);
 
-      return getColor(tempRay, lights, recursions - 1, shapes);
-    }
-        
-    {
+      
+      return computeRayColor(tempRay, shapes, lights, recursions - 1);
+      //return getColor(tempRay, lights, recursions - 1, shapes);
+    } else {
       vec3 unit_direction = unit_vector(r.direction());
       auto a = 0.5 * (unit_direction.y() + 1.0);
       return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
