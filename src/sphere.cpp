@@ -129,7 +129,7 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
       for (const auto &shape : shapes) {
 
         if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
-          if (shape->getShader() != "mirror") {
+          if (shape->getShader() != "mirror" && shape->getShader() != "normal") {
             return vec3(0, 0, 0);// in shadow
           }
         }
@@ -160,7 +160,7 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
         vec3 N = unit_vector(hitPoint - center);
         return 0.5 * vec3(N.x() + 1, N.y() + 1, N.z() + 1);
       }
-    }
+    } //This if my not be necessary...
   } else if (shader == "lambertian") {
     vec3 color = vec3(0, 0, 0);
 
@@ -186,7 +186,7 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
     if (intersect(r, 0.001, t_max, tempHit)) {
       float kd = 1.0f;
       float ks = 0.6f;
-      float p = 32.0f;
+      float p = 32.0f; //change this so it is not hard coded at some point
       vec3 hitPoint = r.at(tempHit.t);
       vec3 V = unit_vector(-r.direction());
 
@@ -223,13 +223,12 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       ray tempRay(tempHit.point + 0.001 * N, reflection);
 
       
-      return computeRayColor(tempRay, shapes, lights, recursions - 1);
-      //return getColor(tempRay, lights, recursions - 1, shapes);
+      return computeRayColor(tempRay, shapes, lights, recursions);
     } else {
       vec3 unit_direction = unit_vector(r.direction());
       auto a = 0.5 * (unit_direction.y() + 1.0);
       return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
-    }
+    } //sky color
   }
   return objectColor;
 } 

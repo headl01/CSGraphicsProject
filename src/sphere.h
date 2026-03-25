@@ -15,7 +15,7 @@ public:
 
   bool intersect(const ray &r, float t_min, float &t_max, HitStruct &hit) const override;
 
-  vec3 ray_color(const ray &r, std::vector<point3> lights, std::vector<Sphere> objectList, int recursions);
+  vec3 ray_color(const ray &r, std::vector<point3> lights, std::vector<Shape> objectList, int recursions);
 
   vec3 getColor(ray r, std::vector<point3> lights, int recursions, std::vector<std::shared_ptr<Shape>> shapes) const override;
 
