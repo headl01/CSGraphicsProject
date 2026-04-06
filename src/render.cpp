@@ -49,7 +49,7 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
       for (const auto &shape : shapes) {
         
         if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
-          if (shape->getShader() != "mirror" && shape->getShader() != "normal") {
+          if (shape->getShader() != "mirror") {
             return vec3(0, 0, 0);// in shadow
           }
         }
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   int height = 1000;
   PerspectiveCamera p(width, height);
   Framebuffer fb(width, height);
-  srand(time(0)); //initializing the random time
+  srand(time(0));
 
   std::vector<Sphere> objectList;
   std::vector<point3> lights;
@@ -105,14 +105,14 @@ int main(int argc, char *argv[])
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
   shapes.push_back(std::make_shared<Sphere>(s1));
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
 
   Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 0, 0, 100 }, "lambertian");
   
- shapes.push_back(std::make_shared<Sphere>(s2));
+ //shapes.push_back(std::make_shared<Sphere>(s2));
  shapes.push_back(std::make_shared<Sphere>(s));
 
- //shapes.push_back(std::make_shared<Sphere>(s3));
+ shapes.push_back(std::make_shared<Sphere>(s3));
 
  Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "lambertian");
  shapes.push_back(std::make_shared<Sphere>(ground));
