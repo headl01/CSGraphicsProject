@@ -19,29 +19,6 @@ int CheckGLErrors(const char *s)
     return errCount;
 }
 
-struct vertexColoring
-{
-  vec3 pos;
-  vec3 color;
-};
-
-std::list<vertexColoring> generateVertexListWcol(std::vector<float> host_VertexBuffer)
-{
-  std::list<vertexColoring> vertexList;
-  for (int i = 0; i < host_VertexBuffer.size(); i++) {
-      if (i == 0%6) {
-        vertexColoring tempV;
-        tempV.pos = point3{ host_VertexBuffer[i], host_VertexBuffer[i + 1], host_VertexBuffer[i + 2] };
-        tempV.color = vec3{ host_VertexBuffer[i + 3], host_VertexBuffer[i + 4], host_VertexBuffer[i + 5] };
-        vertexList.push_back(tempV);
-        i += 5;
-      }
-  }
-
-
-    return vertexList;
-}
-
 
 int main(void)
 {
