@@ -9,6 +9,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "../src/vec3/vec3.h"
 
 #include "GLSL.h"
 
@@ -17,15 +18,34 @@ int CheckGLErrors(const char *s)
     int errCount = 0;
     return errCount;
 }
-#include <filesystem>
+
+struct vertexColoring
+{
+  vec3 pos;
+  vec3 color;
+};
+
+std::list<vertexColoring> generateVertexListWcol(std::vector<float> host_VertexBuffer)
+{
+  std::list<vertexColoring> vertexList;
+  for (int i = 0; i < host_VertexBuffer.size(); i++) {
+      if (i == 0%6) {
+        vertexColoring tempV;
+        tempV.pos = point3{ host_VertexBuffer[i], host_VertexBuffer[i + 1], host_VertexBuffer[i + 2] };
+        tempV.color = vec3{ host_VertexBuffer[i + 3], host_VertexBuffer[i + 4], host_VertexBuffer[i + 5] };
+        vertexList.push_back(tempV);
+        i += 5;
+      }
+  }
+
+
+    return vertexList;
+}
+
+
 int main(void)
 {
 
-    
-
-  std::cout << "Working dir: "
-            << std::filesystem::current_path()
-            << std::endl;
     /* Initialize the library */
     if (!glfwInit()) {
         exit (-1);
@@ -90,16 +110,19 @@ int main(void)
     glGenBuffers(1, &m_triangleVBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO);
 
+    struct vertexColoring
+    {
+      vec3 pos;
+      vec3 color;
+    };
     
     // this is the actual triangle data that will be copied to
     // the GPU memory
-    std::vector<float> host_VertexBuffer{ -0.5f, -0.5f, 0.0f,// V0
-      0.5f,
-      -0.5f,
-      0.0f,// V1
-      0.0f,
-      0.5f,
-      0.0f };// V2
+    std::vector<float> host_VertexBuffer{ 
+      -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,// V0  
+      0.5f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f, // V1
+      0.0f,0.5f,0.0f, 0.0f, 0.0f , 1.0f// V2
+    }; //VBO with colors
 
     
     // copy the numBytes from host_VertexBuffer t the GPU and store in
@@ -119,7 +142,11 @@ int main(void)
     // (Position of the vertex)
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0); //change this line for the numBytes, right now it is set for six
+    
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
     glBindVertexArray(0);
 
     // Create a shader using my GLSLObject class
@@ -151,14 +178,14 @@ int main(void)
         // background color)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* Render your objects here */
+   
         /* Render your objects here */
         shader.activate();
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
         shader.deactivate();
-        std::cout << "running\n";
+
         // Swap the front and back buffers
         glfwSwapBuffers(window);
 
