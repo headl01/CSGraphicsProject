@@ -95,11 +95,47 @@ int main(void)
     
     // this is the actual triangle data that will be copied to
     // the GPU memory
-    std::vector<float> host_VertexBuffer{ 
-      -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,// V0  
-      0.5f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f, // V1
-      0.0f,0.5f,0.0f, 0.0f, 0.0f , 1.0f// V2
-    }; //VBO with colors
+    std::vector<float> host_VertexBuffer{
+      // Triangle 1
+      -0.5f,
+      -0.5f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.25f,// V0
+      0.5f,
+      -0.25f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.55f,// V1
+      0.0f,
+      0.5f,
+      0.0f,
+      0.0f,
+      0.0f,
+      1.0f,// V2
+
+      // Triangle 2
+      -1.5f,
+      -0.5f,
+      -0.5f,
+      0.0f,
+      0.5f,
+      0.25f,// V0
+      0.5f,
+      -0.25f,
+      0.0f,
+      0.0f,
+      0.0f,
+      0.55f,// V1
+      0.0f,
+      0.5f,
+      0.0f,
+      0.0f,
+      0.0f,
+      1.0f// V2
+    };// VBO with colors
 
     
     // copy the numBytes from host_VertexBuffer t the GPU and store in
@@ -133,7 +169,8 @@ int main(void)
     shader.createProgram();
 
 
-    
+    int numFloats = host_VertexBuffer.size();
+    int numVertices = numFloats / 6;
 
 
     // once copied, we no longer need the data on the host
@@ -155,11 +192,12 @@ int main(void)
         // background color)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   
+        
+
         /* Render your objects here */
         shader.activate();
         glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, numVertices); //This line draws the triangles by number of triangles
         glBindVertexArray(0);
         shader.deactivate();
 
