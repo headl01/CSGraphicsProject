@@ -12,6 +12,7 @@
 #include "../src/vec3/vec3.h"
 
 #include "GLSL.h"
+#include "SimpleCamera_Impl.h"
 
 int CheckGLErrors(const char *s)
 {
@@ -62,7 +63,7 @@ int main(void)
     std::cout << "Renderer: " << renderer << std::endl;
     std::cout << "OpenGL version supported: " << version << std::endl;
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glClearColor(0.0, 0.7, 0.7, 1.0);
 
@@ -177,13 +178,9 @@ int main(void)
 
     // Create a shader using my GLSLObject class
       sivelab::GLSLObject shader;
-    shader.addShader("vertexShader_withMatrix.glsl", sivelab::GLSLObject::VERTEX_SHADER);
-    shader.addShader("fragmentShader.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
+    shader.addShader("vertexShader_withMatrices.glsl", sivelab::GLSLObject::VERTEX_SHADER);
+    shader.addShader("fragmentShader_barycentric.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
     shader.createProgram();
-
-    GLuint projMatrixID, viewMatrixID;
-    projMatrixID = shader.createUniform("projMatrix");
-    viewMatrixID = shader.createUniform("viewMatrix");
 
 
     int numFloats = host_VertexBuffer.size();
@@ -194,16 +191,28 @@ int main(void)
     host_VertexBuffer.clear();
 
 
+    GLuint projMatrixID, viewMatrixID, modelMatrixID;
+    projMatrixID = shader.createUniform("projMatrix");
+    viewMatrixID = shader.createUniform("viewMatrix");
+    modelMatrixID = shader.createUniform("modelMatrix");
 
 
 
 
-
-    glm::vec3 m_pos(0, 0, 0), m_viewDir(0, 0, -1);
+    glm::vec3 m_pos(0, 0, 5), m_viewDir(0, 0, -1);
     glm::vec3 m_U(1, 0, 0), m_V(0, 1, 0), m_W(0, 0, 1);
+
+      glm::mat4 modelTransform = glm::mat4(1.0);
+    // modelTransform = glm::translate(modelTransform, glm::vec3(0.0f, 1.0f, 0.0f));
+    float rot = 0;
+    modelTransform = glm::rotate(modelTransform, rot, glm::vec3(0, 1, 0));
+
+
+    SimpleCamera_Impl cam;
 
     double timeDiff = 0.0, startFrameTime = 0.0, endFrameTime = 0.0;
 
+    float rotAngle = 0.0f;
 
     
     /* Loop until the user closes the window */
@@ -218,7 +227,19 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         
+        #if 0
+    std::cout << "cam.getProjectionMatrix: \n"
+              << '\t' << cam.getProjectionMatrix()[0][0] << ' ' << cam.getProjectionMatrix()[0][1] << ' ' << cam.getProjectionMatrix()[0][2] << ' ' << cam.getProjectionMatrix()[0][3] << '\n'
+              << '\t' << cam.getProjectionMatrix()[1][0] << ' ' << cam.getProjectionMatrix()[1][1] << ' ' << cam.getProjectionMatrix()[1][2] << ' ' << cam.getProjectionMatrix()[1][3] << '\n'
+              << '\t' << cam.getProjectionMatrix()[2][0] << ' ' << cam.getProjectionMatrix()[2][1] << ' ' << cam.getProjectionMatrix()[2][2] << ' ' << cam.getProjectionMatrix()[2][3] << '\n'
+              << '\t' << cam.getProjectionMatrix()[3][0] << ' ' << cam.getProjectionMatrix()[3][1] << ' ' << cam.getProjectionMatrix()[3][2] << ' ' << cam.getProjectionMatrix()[3][3] << std::endl;
 
+    std::cout << "cam.getViewMatrix: \n"
+              << '\t' << cam.getViewMatrix()[0][0] << ' ' << cam.getViewMatrix()[0][1] << ' ' << cam.getViewMatrix()[0][2] << ' ' << cam.getViewMatrix()[0][3] << '\n'
+              << '\t' << cam.getViewMatrix()[1][0] << ' ' << cam.getViewMatrix()[1][1] << ' ' << cam.getViewMatrix()[1][2] << ' ' << cam.getViewMatrix()[1][3] << '\n'
+              << '\t' << cam.getViewMatrix()[2][0] << ' ' << cam.getViewMatrix()[2][1] << ' ' << cam.getViewMatrix()[2][2] << ' ' << cam.getViewMatrix()[2][3] << '\n'
+              << '\t' << cam.getViewMatrix()[3][0] << ' ' << cam.getViewMatrix()[3][1] << ' ' << cam.getViewMatrix()[3][2] << ' ' << cam.getViewMatrix()[3][3] << std::endl;
+#endif
   
         
 
@@ -227,10 +248,11 @@ int main(void)
 
         /* Render your objects here */
         shader.activate();
-
-        // copy from the host to the device the view matrix and the projection matrix
-        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(M_ortho));
+        // pass in the new camera matrix and the projection matrix
+        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
         glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, glm::value_ptr(M_view));
+        glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, glm::value_ptr(modelTransform));    
+
 
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, numVertices);// This line draws the triangles by number of triangles
