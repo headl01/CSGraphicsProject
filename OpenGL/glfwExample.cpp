@@ -1,6 +1,7 @@
 ﻿#include <cstdlib>
 #include <iostream>
 #include <vector>
+#include "ray.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -91,22 +92,39 @@ int main(void)
 
   // this is the actual triangle data that will be copied to
   // the GPU memory
-  std::vector<float> host_VertexBuffer{ -3.0f, -3.0f, 0.0f,// V0
-    1.0,
-    0.08,
-    0.18,
-    3.0f,
-    -3.0f,
-    0.0f,// V1
-    0.0,
-    0.95,
-    0.87,
-    0.0f,
-    3.0f,
-    0.0f,// V2
-    0.58,
-    0.0,
-    1.0 };
+  std::vector<float> host_VertexBuffer{ 
+    -3.0f, -3.0f, 0.0f,       1.0, 0.08, 0.18,
+    3.0f,-3.0f, 0.0f,         0.0, 0.95, 0.87,
+    0.0f, 3.0f, 0.0f,         0.58, 0.0, 1.0 
+  };
+
+  /**/
+  for (int i = 0; i < host_VertexBuffer.size(); i++) {
+    vec3 a(host_VertexBuffer[i], host_VertexBuffer[i + 1], host_VertexBuffer[i + 2]);
+    vec3 b(host_VertexBuffer[i + 6], host_VertexBuffer[i + 7], host_VertexBuffer[i + 8]);
+    vec3 c(host_VertexBuffer[i + 12], host_VertexBuffer[i + 13], host_VertexBuffer[i + 14]);
+
+    vec3 ab = b - a;
+    vec3 ac = c - a;
+    vec3 norm = unit_vector(cross(ab, ac));
+
+    //encode norm x
+    host_VertexBuffer[i + 3] = norm.x();
+    host_VertexBuffer[i + 9] = norm.x();
+    host_VertexBuffer[i + 15] = norm.x();
+
+    //encode norm y
+    host_VertexBuffer[i + 4] = norm.y();
+    host_VertexBuffer[i + 10] = norm.y();
+    host_VertexBuffer[i + 16] = norm.y();
+
+    //encode norm z
+    host_VertexBuffer[i + 5] = norm.z();
+    host_VertexBuffer[i + 11] = norm.z();
+    host_VertexBuffer[i + 17] = norm.z();
+
+    i += 17;
+  } //finds the norms of the triangle
 
   int numBytes = host_VertexBuffer.size() * sizeof(float);
 
@@ -132,6 +150,7 @@ int main(void)
 
   glEnableVertexAttribArray(0);// enable attrib 0 - Vertex Position
   glEnableVertexAttribArray(1);// enable attrib 1 - Vertex color
+  //glEnableVertexAttribArray(2);// enable attrib 1 - Vertex color
 
   glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
@@ -190,7 +209,7 @@ int main(void)
 
     modelTransform = glm::mat4(1.0);
     modelTransform = glm::rotate(modelTransform, rotAngle, glm::vec3(0, 1, 0));
-    rotAngle += 0.05;
+    rotAngle += 0.005;
     if (rotAngle > 2.0 * 3.14159) rotAngle = 0.0f;
 
     // pass in the new camera matrix and the projection matrix

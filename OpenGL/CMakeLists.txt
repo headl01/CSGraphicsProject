@@ -3,7 +3,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_executable (glfwExample
   glfwExample.cpp 
   GLSL.cpp GLSL.h
- "SimpleCamera_Impl.h" "SimpleCamera_Impl.cpp")
+ "SimpleCamera_Impl.h" "SimpleCamera_Impl.cpp" "ray.h")
 
 target_link_libraries (glfwExample PRIVATE GLEW::GLEW)
 target_link_libraries (glfwExample PRIVATE glfw)
