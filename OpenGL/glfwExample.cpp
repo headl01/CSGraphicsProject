@@ -9,225 +9,169 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "../src/vec3/vec3.h"
 
 #include "GLSL.h"
+
 #include "SimpleCamera_Impl.h"
 
 int CheckGLErrors(const char *s)
 {
-    int errCount = 0;
-    return errCount;
+  int errCount = 0;
+  return errCount;
 }
-
 
 int main(void)
 {
+  /* Initialize the library */
+  if (!glfwInit()) {
+    exit(-1);
+  }
+  // throw std::runtime_error("Error! initialization of glfw failed!");
 
-    /* Initialize the library */
-    if (!glfwInit()) {
-        exit (-1);
-    }
-    // throw std::runtime_error("Error! initialization of glfw failed!");
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  /* Create a windowed mode window and its OpenGL context */
+  int winWidth = 1000;
+  float aspectRatio = 1.0;// 16.0 / 9.0; // winWidth / (float)winHeight;
+  int winHeight = winWidth / aspectRatio;
 
-    /* Create a windowed mode window and its OpenGL context */
-    int winWidth = 1000;
-    float aspectRatio = 1.0; // 16.0 / 9.0; // winWidth / (float)winHeight;
-    int winHeight = winWidth / aspectRatio;
-    
-    GLFWwindow* window = glfwCreateWindow(winWidth, winHeight, "GLFW Example", NULL, NULL);
-    if (!window) {
-        std::cerr << "GLFW did not create a window!" << std::endl;
-        
-        glfwTerminate();
-        return -1;
-    }
+  GLFWwindow *window = glfwCreateWindow(winWidth, winHeight, "GLFW Example", NULL, NULL);
+  if (!window) {
+    std::cerr << "GLFW did not create a window!" << std::endl;
 
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    glfwTerminate();
+    return -1;
+  }
 
-    glewExperimental = GL_TRUE;
-    GLenum err=glewInit();
-    if(err != GLEW_OK) {
-        std::cerr <<"GLEW Error! glewInit failed, exiting."<< std::endl;
-        exit(EXIT_FAILURE);
-    }
+  /* Make the window's context current */
+  glfwMakeContextCurrent(window);
 
-    const GLubyte* renderer = glGetString (GL_RENDERER);
-    const GLubyte* version = glGetString (GL_VERSION);
-    std::cout << "Renderer: " << renderer << std::endl;
-    std::cout << "OpenGL version supported: " << version << std::endl;
+  glewExperimental = GL_TRUE;
+  GLenum err = glewInit();
+  if (err != GLEW_OK) {
+    std::cerr << "GLEW Error! glewInit failed, exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
 
-    //glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glClearColor(0.0, 0.7, 0.7, 1.0);
+  const GLubyte *renderer = glGetString(GL_RENDERER);
+  const GLubyte *version = glGetString(GL_VERSION);
+  std::cout << "Renderer: " << renderer << std::endl;
+  std::cout << "OpenGL version supported: " << version << std::endl;
 
-    int fb_width, fb_height;
-    glfwGetFramebufferSize(window, &fb_width, &fb_height);
-    glViewport(0, 0, fb_width, fb_height);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+  glClearColor(0.08, 0.08, 0.1, 1.0);
 
-    // Need to set a projection matrix that fits the aspect ratio set
-    // by the window frame.
-    //
-    // The ortho parameters, in order: left, right, bottom, top, zNear, zFar
-    // 
-    // 
-    
-    // OrthoMatrix
-    //   The ortho parameters, in order: left, right, bottom, top, zNear, zFar
-    float halfWidth = 15.0 / 2.0;
-    float halfHeight = halfWidth;
+  int fb_width, fb_height;
+  glfwGetFramebufferSize(window, &fb_width, &fb_height);
+  glViewport(0, 0, fb_width, fb_height);
 
-    float left = -halfWidth;
-    float right = halfWidth;
+  // Need to set a projection matrix that fits the aspect ratio set
+  // by the window frame.
+  //
 
-    float bottom = -halfHeight;
-    float top = halfHeight;
+  GLint major_version;
+  glGetIntegerv(GL_MAJOR_VERSION, &major_version);
+  std::cout << "GL_MAJOR_VERSION: " << major_version << std::endl;
 
-    float near = 5.0f;
-    float far = -5.0f;
+  // Initialize all my data and get it on the GPU.
+  // load the scene file...
+  // get my shapes in the scene...
 
-    glm::mat4 M_ortho = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, near, far);
-    // End OrthoMatrix
+  GLuint m_triangleVBO[1], m_VAO;
 
-    //float halfWidth = 15.0 / 2.0;
-    //float halfHeight = halfWidth / aspectRatio;
-    glm::mat4 projectionMatrix = glm::ortho(-halfWidth, halfWidth, -(halfWidth / aspectRatio), (halfWidth / aspectRatio), -10.0f, 10.0f);
+  // load a triangle...
+  // create a Vertex Array Buffer to hold our triangle data
+  glGenBuffers(1, m_triangleVBO);
 
-    GLint major_version;
-    glGetIntegerv(GL_MAJOR_VERSION, &major_version);
-    std::cout << "GL_MAJOR_VERSION: " << major_version << std::endl;
+  glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
 
-    // create a Vertex Array Buffer to hold our triangle data
-    GLuint m_triangleVBO;
-    glGenBuffers(1, &m_triangleVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO);
+  // this is the actual triangle data that will be copied to
+  // the GPU memory
+  std::vector<float> host_VertexBuffer{ -3.0f, -3.0f, 0.0f,// V0
+    1.0,
+    0.08,
+    0.18,
+    3.0f,
+    -3.0f,
+    0.0f,// V1
+    0.0,
+    0.95,
+    0.87,
+    0.0f,
+    3.0f,
+    0.0f,// V2
+    0.58,
+    0.0,
+    1.0 };
 
-    struct vertexColoring
-    {
-      vec3 pos;
-      vec3 color;
-    };
-    
-    // this is the actual triangle data that will be copied to
-    // the GPU memory
-    std::vector<float> host_VertexBuffer = {
-      // Triangle (3 vertices)
+  int numBytes = host_VertexBuffer.size() * sizeof(float);
 
-      // Vertex 1
-      -1.0f,
-      1.618f,
-      0.0f,
-      1.0f,
-      0.0f,
-      0.0f,
+  // copy the numBytes from host_VertexBuffer t the GPU and store in
+  // the currently bound VBO
+  glBufferData(GL_ARRAY_BUFFER, numBytes, host_VertexBuffer.data(), GL_STATIC_DRAW);
 
-      // Vertex 2
-      -1.618f,
-      0.0f,
-      1.0f,
-      0.0f,
-      1.0f,
-      0.0f,
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-      // Vertex 3
-      0.0f,
-      1.0f,
-      1.618f,
-      0.0f,
-      0.0f,
-      1.0f
-    };
-    // VBO with colors
+  // once copied, we no longer need the data on the host
+  host_VertexBuffer.clear();
 
-    /**
-    for (int i = 0; i < host_VertexBuffer.size(); i++) {
-      if (i % 6 < 3) {// first 3 floats = position
-        host_VertexBuffer[i] *= 0.25f;
-      }
-    }
-    **/
-    // copy the numBytes from host_VertexBuffer t the GPU and store in
-    // the currently bound VBO
-    int numBytes = host_VertexBuffer.size() * sizeof(float);
-    glBufferData(GL_ARRAY_BUFFER, numBytes, host_VertexBuffer.data(), GL_STATIC_DRAW);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+  // VAO for the VBO
+  // create a vertex array object that will map the attributes in
+  // our vertex buffer to different location attributes for our
+  // // shaders
 
-    // create a vertex array object that will map the attributes in
-    // our vertex buffer to different location attributes for our
-    // shaders
-    GLuint m_VAO;
-    glGenVertexArrays(1, &m_VAO);
-    glBindVertexArray(m_VAO);
+  glGenVertexArrays(1, &m_VAO);
+  glBindVertexArray(m_VAO);
 
-    // VAO details here - we only have 1 attribute or location
-    // (Position of the vertex)
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0); //change this line for the numBytes, right now it is set for six
-    
+  // VAO details here - we only have 1 attribute or location
+  // (Position of the vertex)
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(3 * sizeof(GLfloat)));
-    glBindVertexArray(0);
+  glEnableVertexAttribArray(0);// enable attrib 0 - Vertex Position
+  glEnableVertexAttribArray(1);// enable attrib 1 - Vertex color
 
-    // Create a shader using my GLSLObject class
-      sivelab::GLSLObject shader;
-    shader.addShader("vertexShader_withMatrices.glsl", sivelab::GLSLObject::VERTEX_SHADER);
-    shader.addShader("fragmentShader_barycentric.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
-    shader.createProgram();
+  glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)12);// Color
+  glBindVertexArray(0);
+
+  // Create a shader using my GLSLObject class
+  sivelab::GLSLObject shader;
+  shader.addShader("vertexShader_withMatrices.glsl", sivelab::GLSLObject::VERTEX_SHADER);
+  shader.addShader("fragmentShader_barycentric.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
+  shader.createProgram();
+
+  GLuint projMatrixID, viewMatrixID, modelMatrixID;
+  projMatrixID = shader.createUniform("projMatrix");
+  viewMatrixID = shader.createUniform("viewMatrix");
+  modelMatrixID = shader.createUniform("modelMatrix");
+
+  glm::mat4 modelTransform = glm::mat4(1.0);
+  // modelTransform = glm::translate(modelTransform, glm::vec3(0.0f, 1.0f, 0.0f));
+  float rot = 0;
+  modelTransform = glm::rotate(modelTransform, rot, glm::vec3(0, 1, 0));
 
 
-    int numFloats = host_VertexBuffer.size();
-    int numVertices = numFloats / 6; //change the number of triangles rendered dynamically
+  SimpleCamera_Impl cam;
 
+  double timeDiff = 0.0, startFrameTime = 0.0, endFrameTime = 0.0;
 
-    // once copied, we no longer need the data on the host
-    host_VertexBuffer.clear();
+  float rotAngle = 0.0f;
 
+  /* Loop until the user closes the window */
+  while (!glfwWindowShouldClose(window)) {
+    endFrameTime = glfwGetTime();
+    timeDiff = endFrameTime - startFrameTime;
+    startFrameTime = glfwGetTime();
 
-    GLuint projMatrixID, viewMatrixID, modelMatrixID;
-    projMatrixID = shader.createUniform("projMatrix");
-    viewMatrixID = shader.createUniform("viewMatrix");
-    modelMatrixID = shader.createUniform("modelMatrix");
+    // Clear the window's buffer (or clear the screen to our
+    // background color)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
-
-    glm::vec3 m_pos(0, 0, 5), m_viewDir(0, 0, -1);
-    glm::vec3 m_U(1, 0, 0), m_V(0, 1, 0), m_W(0, 0, 1);
-
-      glm::mat4 modelTransform = glm::mat4(1.0);
-    // modelTransform = glm::translate(modelTransform, glm::vec3(0.0f, 1.0f, 0.0f));
-    float rot = 0;
-    modelTransform = glm::rotate(modelTransform, rot, glm::vec3(0, 1, 0));
-
-
-    SimpleCamera_Impl cam;
-
-    double timeDiff = 0.0, startFrameTime = 0.0, endFrameTime = 0.0;
-
-    float rotAngle = 0.0f;
-
-    
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        endFrameTime = glfwGetTime();
-        timeDiff = endFrameTime - startFrameTime;
-        startFrameTime = glfwGetTime();
-
-        // Clear the window's buffer (or clear the screen to our
-        // background color)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        
-        #if 0
+#if 0
     std::cout << "cam.getProjectionMatrix: \n"
               << '\t' << cam.getProjectionMatrix()[0][0] << ' ' << cam.getProjectionMatrix()[0][1] << ' ' << cam.getProjectionMatrix()[0][2] << ' ' << cam.getProjectionMatrix()[0][3] << '\n'
               << '\t' << cam.getProjectionMatrix()[1][0] << ' ' << cam.getProjectionMatrix()[1][1] << ' ' << cam.getProjectionMatrix()[1][2] << ' ' << cam.getProjectionMatrix()[1][3] << '\n'
@@ -240,52 +184,49 @@ int main(void)
               << '\t' << cam.getViewMatrix()[2][0] << ' ' << cam.getViewMatrix()[2][1] << ' ' << cam.getViewMatrix()[2][2] << ' ' << cam.getViewMatrix()[2][3] << '\n'
               << '\t' << cam.getViewMatrix()[3][0] << ' ' << cam.getViewMatrix()[3][1] << ' ' << cam.getViewMatrix()[3][2] << ' ' << cam.getViewMatrix()[3][3] << std::endl;
 #endif
-  
-        
 
-        // create the view matrix from our camera data
-        glm::mat4 M_view = glm::lookAt(m_pos, m_pos - m_W, m_V);
+    /* Render your objects here */
+    shader.activate();
 
-        /* Render your objects here */
-        shader.activate();
-        // pass in the new camera matrix and the projection matrix
-        glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-        glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, glm::value_ptr(M_view));
-        glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, glm::value_ptr(modelTransform));    
+    modelTransform = glm::mat4(1.0);
+    modelTransform = glm::rotate(modelTransform, rotAngle, glm::vec3(0, 1, 0));
+    rotAngle += 0.05;
+    if (rotAngle > 2.0 * 3.14159) rotAngle = 0.0f;
 
+    // pass in the new camera matrix and the projection matrix
+    glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+    glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, glm::value_ptr(cam.getViewMatrix()));
+    glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, glm::value_ptr(modelTransform));
 
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, numVertices);// This line draws the triangles by number of triangles
-        glBindVertexArray(0);
+    glBindVertexArray(m_VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(0);
+    shader.deactivate();
 
-        shader.deactivate();
+    // Swap the front and back buffers
+    glfwSwapBuffers(window);
 
-        // Swap the front and back buffers
-        glfwSwapBuffers(window);
+    /* Poll for and process events */
+    glfwPollEvents();
 
-        /* Poll for and process events */
-        glfwPollEvents();
-
-        float moveRatePerFrame = 0.005;
-
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-          m_pos = m_pos + -m_W * moveRatePerFrame;
-        } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-          m_pos = m_pos - m_U * moveRatePerFrame;
-        } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-          m_pos = m_pos + m_W * moveRatePerFrame;
-        } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-          m_pos = m_pos + m_U * moveRatePerFrame;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-          std::cout << "fps: " << 1.0 / timeDiff << std::endl;
-        }
-        if (glfwGetKey(window, GLFW_KEY_BACKSPACE) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-          break;
-        }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+      cam.moveForward();
+    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+      cam.strafeLeft();
+    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+      cam.moveBackward();
+    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+      cam.strafeRight();
     }
-  
-    glfwTerminate();
-    return 0;
+
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+      std::cout << "fps: " << 1.0 / timeDiff << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+      glfwSetWindowShouldClose(window, 1);
+    }
+  }
+
+  glfwTerminate();
+  return 0;
 }
