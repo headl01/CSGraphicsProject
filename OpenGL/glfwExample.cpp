@@ -64,7 +64,7 @@ int main(void)
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  glClearColor(0.08, 0.08, 0.1, 1.0);
+  glClearColor(0.18, 0.58, 0.1, 1.0);
 
   int fb_width, fb_height;
   glfwGetFramebufferSize(window, &fb_width, &fb_height);
@@ -93,13 +93,16 @@ int main(void)
   // this is the actual triangle data that will be copied to
   // the GPU memory
   std::vector<float> host_VertexBuffer{ 
-    -3.0f, -3.0f, 0.0f,       1.0, 0.08, 0.18,
-    3.0f,-3.0f, 0.0f,         0.0, 0.95, 0.87,
-    0.0f, 3.0f, 0.0f,         0.58, 0.0, 1.0 
+    1.5f, -3.5f, 1.0f,       1.0, 0.08, 0.18,
+    3.0f,-3.0f, 5.0f,         0.0, 0.95, 0.87,
+    0.0f, 3.0f, 2.0f,         0.58, 0.0, 1.0, 
+    -1.5f, -3.5f, 3.0f,       1.0, 0.08, 0.18, 
+    3.0f, 3.0f, 0.0f,        0.0, 0.95, 0.87, 
+    0.0f, 3.0f, -2.0f,         0.58, 0.0, 1.0 
   };
 
   /**/
-  for (int i = 0; i < host_VertexBuffer.size(); i++) {
+  for (int i = 0; i < host_VertexBuffer.size(); i+=18) {
     vec3 a(host_VertexBuffer[i], host_VertexBuffer[i + 1], host_VertexBuffer[i + 2]);
     vec3 b(host_VertexBuffer[i + 6], host_VertexBuffer[i + 7], host_VertexBuffer[i + 8]);
     vec3 c(host_VertexBuffer[i + 12], host_VertexBuffer[i + 13], host_VertexBuffer[i + 14]);
@@ -123,8 +126,9 @@ int main(void)
     host_VertexBuffer[i + 11] = norm.z();
     host_VertexBuffer[i + 17] = norm.z();
 
-    i += 17;
   } //finds the norms of the triangle
+
+  int numTriangles = host_VertexBuffer.size() / 6;
 
   int numBytes = host_VertexBuffer.size() * sizeof(float);
 
@@ -154,25 +158,31 @@ int main(void)
 
   glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)12);// Color
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)12);// normal
   glBindVertexArray(0);
 
   // Create a shader using my GLSLObject class
   sivelab::GLSLObject shader;
-  shader.addShader("vertexShader_withMatrices.glsl", sivelab::GLSLObject::VERTEX_SHADER);
-  shader.addShader("fragmentShader_barycentric.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
+  shader.addShader("vertexShader_prepForPerFragment.glsl", sivelab::GLSLObject::VERTEX_SHADER);
+  shader.addShader("fragment_prepForPerFragment.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
   shader.createProgram();
 
-  GLuint projMatrixID, viewMatrixID, modelMatrixID;
+  GLuint projMatrixID, viewMatrixID, modelMatrixID, normalMatrixID, light, diffuseComponentID;
   projMatrixID = shader.createUniform("projMatrix");
   viewMatrixID = shader.createUniform("viewMatrix");
   modelMatrixID = shader.createUniform("modelMatrix");
+  normalMatrixID = shader.createUniform("normalMatrix");
+  diffuseComponentID = shader.createUniform("diffuseComponent");
+
+  light = shader.createUniform("lightPosWorld");
 
   glm::mat4 modelTransform = glm::mat4(1.0);
+  glm::vec4 lightPos = glm::vec4(1, 1, 1, 1);
+  glm::vec3 diffuseComponentColor = glm::vec3(.5, .1, .75);
   // modelTransform = glm::translate(modelTransform, glm::vec3(0.0f, 1.0f, 0.0f));
   float rot = 0;
   modelTransform = glm::rotate(modelTransform, rot, glm::vec3(0, 1, 0));
-
+  glm::mat4 normalMtrx = glm::mat4(1.0);
 
   SimpleCamera_Impl cam;
 
@@ -207,18 +217,25 @@ int main(void)
     /* Render your objects here */
     shader.activate();
 
+
+
     modelTransform = glm::mat4(1.0);
     modelTransform = glm::rotate(modelTransform, rotAngle, glm::vec3(0, 1, 0));
-    rotAngle += 0.005;
+    normalMtrx = glm::transpose(glm::inverse(modelTransform)); //M^t^-1
+    rotAngle += 0.0005;
     if (rotAngle > 2.0 * 3.14159) rotAngle = 0.0f;
+    
 
     // pass in the new camera matrix and the projection matrix
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
     glUniformMatrix4fv(viewMatrixID, 1, GL_FALSE, glm::value_ptr(cam.getViewMatrix()));
     glUniformMatrix4fv(modelMatrixID, 1, GL_FALSE, glm::value_ptr(modelTransform));
+    glUniformMatrix4fv(normalMatrixID, 1, GL_FALSE, glm::value_ptr(normalMtrx));
+    glUniform4fv(light, 1, glm::value_ptr(lightPos));
+    glUniform3fv(diffuseComponentID, 1, glm::value_ptr(diffuseComponentColor));
 
     glBindVertexArray(m_VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, numTriangles); //numTriangles dynamically renders based on the number of triangles in VBO
     glBindVertexArray(0);
     shader.deactivate();
 
@@ -230,11 +247,11 @@ int main(void)
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
       cam.moveForward();
-    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    }  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
       cam.strafeLeft();
-    } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    }  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       cam.moveBackward();
-    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    }  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
       cam.strafeRight();
     }
 
