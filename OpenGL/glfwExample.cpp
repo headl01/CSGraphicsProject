@@ -93,28 +93,239 @@ int main(void)
   // this is the actual triangle data that will be copied to
   // the GPU memory
   std::vector<float> host_VertexBuffer = {
-    1,1,1, 1,1,1,
-    -1,-1,-1, 0,0,0,
-    5,3,-2,0,0,0,
+    // Front (+Z)
+    -1,
+    -1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    -1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1,
+
+    -1,
+    -1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1,
+    -1,
+    1,
+    1,
+    0,
+    0,
+    1,
+
+    // Back (-Z)
+    -1,
+    -1,
+    -1,
+    0,
+    0,
+    -1,
+    1,
+    1,
+    -1,
+    0,
+    0,
+    -1,
+    1,
+    -1,
+    -1,
+    0,
+    0,
+    -1,
+
+    -1,
+    -1,
+    -1,
+    0,
+    0,
+    -1,
+    -1,
+    1,
+    -1,
+    0,
+    0,
+    -1,
+    1,
+    1,
+    -1,
+    0,
+    0,
+    -1,
+
+    // Left (-X)
+    -1,
+    -1,
+    -1,
+    -1,
+    0,
+    0,
+    -1,
+    -1,
+    1,
+    -1,
+    0,
+    0,
+    -1,
+    1,
+    1,
+    -1,
+    0,
+    0,
+
+    -1,
+    -1,
+    -1,
+    -1,
+    0,
+    0,
+    -1,
+    1,
+    1,
+    -1,
+    0,
+    0,
+    -1,
+    1,
+    -1,
+    -1,
+    0,
+    0,
+
+    // Right (+X)
+    1,
+    -1,
+    -1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1,
+    -1,
+    1,
+    1,
+    0,
+    0,
 
     1,
-    2,
-    2,
+    -1,
+    -1,
     1,
-    3,
+    0,
+    0,
+    1,
+    1,
+    -1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+
+    // Top (+Y)
+    -1,
+    1,
+    -1,
+    0,
+    1,
+    0,
+    -1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+
+    -1,
+    1,
+    -1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    -1,
+    0,
+    1,
+    0,
+
+    // Bottom (-Y)
+    -1,
+    -1,
+    -1,
+    0,
+    -1,
+    0,
+    1,
+    -1,
+    1,
+    0,
+    -1,
+    0,
+    -1,
+    -1,
+    1,
+    0,
+    -1,
+    0,
+
+    -1,
+    -1,
+    -1,
+    0,
+    -1,
+    0,
     1,
     -1,
     -1,
-    -4,
     0,
+    -1,
     0,
+    1,
+    -1,
+    1,
     0,
-    5,
-    3,
-    -2,
+    -1,
     0,
-    0,
-    0
   };
 
   std::vector<float> temp_VertexBuffer = {};
@@ -126,7 +337,7 @@ int main(void)
   avgPt = avgPt / (host_VertexBuffer.size() / 6);
   float rad = sqrt(pow((avgPt.x() - host_VertexBuffer[0]), 2) + pow((avgPt.y() - host_VertexBuffer[1]), 2) + pow((avgPt.z() - host_VertexBuffer[2]), 2));
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 5; i++) { //Edit the i for number of recursiouns
       for (int j = 0; j < host_VertexBuffer.size(); j+=18) {
           //find midpoints
         vec3 A(host_VertexBuffer[j], host_VertexBuffer[j + 1], host_VertexBuffer[j + 2]);
@@ -241,9 +452,10 @@ int main(void)
 
   //host_VertexBuffer = temp_VertexBuffer;
 
+  /*
   for (int i = 0; i < temp_VertexBuffer.size(); i++) {
     std::cout << temp_VertexBuffer[i];
-  }
+  }*/
 
   /**/
   for (int i = 0; i < host_VertexBuffer.size(); i+=18) {
@@ -307,8 +519,8 @@ int main(void)
 
   // Create a shader using my GLSLObject class
   sivelab::GLSLObject shader;
-  shader.addShader("vertexShader_withPhongExp.glsl", sivelab::GLSLObject::VERTEX_SHADER);
-  shader.addShader("fragmentShader_withPhong.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
+  shader.addShader("vertexShader_prepForPerFragment.glsl", sivelab::GLSLObject::VERTEX_SHADER);
+  shader.addShader("fragment_prepForPerFragment.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
   shader.createProgram();
 
   GLuint projMatrixID, viewMatrixID, modelMatrixID, normalMatrixID, light, diffuseComponentID, specularID, PhongExponentID, cameraPos;
