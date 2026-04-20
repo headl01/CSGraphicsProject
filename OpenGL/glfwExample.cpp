@@ -64,7 +64,7 @@ int main(void)
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
-  glClearColor(0.18, 0.58, 0.1, 1.0);
+  glClearColor(0.7216, 0.451, 0.2, 1.0);
 
   int fb_width, fb_height;
   glfwGetFramebufferSize(window, &fb_width, &fb_height);
@@ -93,236 +93,157 @@ int main(void)
   // this is the actual triangle data that will be copied to
   // the GPU memory
   std::vector<float> host_VertexBuffer = {
-    // position            // normal
+    1,1,1, 1,1,1,
+    -1,-1,-1, 0,0,0,
+    5,3,-2,0,0,0,
 
-    // Front (+Z)
-    -1,
-    -1,
-    1,
-    0,
-    0,
-    1,
-    1,
-    -1,
-    1,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    0,
-    0,
-    1,
-    -1,
-    -1,
-    1,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    0,
-    0,
-    1,
-    -1,
-    1,
-    1,
-    0,
-    0,
-    1,
-
-    // Back (-Z)
-    -1,
-    -1,
-    -1,
-    0,
-    0,
-    -1,
-    1,
-    1,
-    -1,
-    0,
-    0,
-    -1,
-    1,
-    -1,
-    -1,
-    0,
-    0,
-    -1,
-    -1,
-    -1,
-    -1,
-    0,
-    0,
-    -1,
-    -1,
-    1,
-    -1,
-    0,
-    0,
-    -1,
-    1,
-    1,
-    -1,
-    0,
-    0,
-    -1,
-
-    // Left (-X)
-    -1,
-    -1,
-    -1,
-    -1,
-    0,
-    0,
-    -1,
-    -1,
-    1,
-    -1,
-    0,
-    0,
-    -1,
-    1,
-    1,
-    -1,
-    0,
-    0,
-    -1,
-    -1,
-    -1,
-    -1,
-    0,
-    0,
-    -1,
-    1,
-    1,
-    -1,
-    0,
-    0,
-    -1,
     1,
-    -1,
-    -1,
-    0,
-    0,
-
-    // Right (+X)
-    1,
-    -1,
-    -1,
-    1,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    0,
-    0,
-    1,
-    -1,
-    1,
-    1,
-    0,
-    0,
-    1,
-    -1,
-    -1,
-    1,
-    0,
-    0,
-    1,
-    1,
-    -1,
-    1,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    0,
-    0,
-
-    // Top (+Y)
-    -1,
-    1,
-    -1,
-    0,
-    1,
-    0,
-    -1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    -1,
-    1,
-    -1,
-    0,
-    1,
-    0,
-    1,
-    1,
-    1,
-    0,
-    1,
-    0,
-    1,
-    1,
-    -1,
-    0,
-    1,
-    0,
-
-    // Bottom (-Y)
-    -1,
-    -1,
-    -1,
-    0,
-    -1,
-    0,
-    1,
-    -1,
+    2,
+    2,
     1,
-    0,
-    -1,
-    0,
-    -1,
-    -1,
+    3,
     1,
-    0,
     -1,
-    0,
-    -1,
-    -1,
     -1,
+    -4,
     0,
-    -1,
-    0,
-    1,
-    -1,
-    -1,
     0,
-    -1,
     0,
-    1,
-    -1,
-    1,
+    5,
+    3,
+    -2,
     0,
-    -1,
     0,
+    0
   };
+
+  std::vector<float> temp_VertexBuffer = {};
+
+  vec3 avgPt(0.0f, 0.0f, 0.0f);
+  for (int j = 0; j < host_VertexBuffer.size(); j+=6) {
+    avgPt+= vec3(host_VertexBuffer[j], host_VertexBuffer[j + 1], host_VertexBuffer[j + 2] );
+  }
+  avgPt = avgPt / (host_VertexBuffer.size() / 6);
+  float rad = sqrt(pow((avgPt.x() - host_VertexBuffer[0]), 2) + pow((avgPt.y() - host_VertexBuffer[1]), 2) + pow((avgPt.z() - host_VertexBuffer[2]), 2));
+
+  for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < host_VertexBuffer.size(); j+=18) {
+          //find midpoints
+        vec3 A(host_VertexBuffer[j], host_VertexBuffer[j + 1], host_VertexBuffer[j + 2]);
+        vec3 B(host_VertexBuffer[j + 6], host_VertexBuffer[j + 7], host_VertexBuffer[j + 8]);
+        vec3 C(host_VertexBuffer[j + 12], host_VertexBuffer[j + 13], host_VertexBuffer[j + 14]);
+
+        vec3 ab = (A + B) / 2;
+        vec3 bc = (B + C) / 2;
+        vec3 ca = (C + A) / 2;
+
+        //correct placement with radius
+        ab = avgPt + rad * unit_vector(ab - avgPt);
+        bc = avgPt + rad * unit_vector(bc - avgPt);
+        ca = avgPt + rad * unit_vector(ca - avgPt);
+
+        //insert new triangles
+        //A ab ca
+        temp_VertexBuffer.push_back(A.x());
+        temp_VertexBuffer.push_back(A.y());
+        temp_VertexBuffer.push_back(A.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(ab.x());
+        temp_VertexBuffer.push_back(ab.y());
+        temp_VertexBuffer.push_back(ab.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(ca.x());
+        temp_VertexBuffer.push_back(ca.y());
+        temp_VertexBuffer.push_back(ca.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+
+        //ab B bc
+        temp_VertexBuffer.push_back(ab.x());
+        temp_VertexBuffer.push_back(ab.y());
+        temp_VertexBuffer.push_back(ab.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(B.x());
+        temp_VertexBuffer.push_back(B.y());
+        temp_VertexBuffer.push_back(B.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(bc.x());
+        temp_VertexBuffer.push_back(bc.y());
+        temp_VertexBuffer.push_back(bc.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+
+        //ca bc c
+
+        temp_VertexBuffer.push_back(ca.x());
+        temp_VertexBuffer.push_back(ca.y());
+        temp_VertexBuffer.push_back(ca.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(bc.x());
+        temp_VertexBuffer.push_back(bc.y());
+        temp_VertexBuffer.push_back(bc.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(C.x());
+        temp_VertexBuffer.push_back(C.y());
+        temp_VertexBuffer.push_back(C.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        //ab bc ca
+
+        temp_VertexBuffer.push_back(ab.x());
+        temp_VertexBuffer.push_back(ab.y());
+        temp_VertexBuffer.push_back(ab.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(bc.x());
+        temp_VertexBuffer.push_back(bc.y());
+        temp_VertexBuffer.push_back(bc.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+        temp_VertexBuffer.push_back(ca.x());
+        temp_VertexBuffer.push_back(ca.y());
+        temp_VertexBuffer.push_back(ca.z());
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+        temp_VertexBuffer.push_back(0.0);
+
+      }
+      host_VertexBuffer = temp_VertexBuffer;
+  }
+
+  //host_VertexBuffer = temp_VertexBuffer;
+
+  for (int i = 0; i < temp_VertexBuffer.size(); i++) {
+    std::cout << temp_VertexBuffer[i];
+  }
 
   /**/
   for (int i = 0; i < host_VertexBuffer.size(); i+=18) {
@@ -332,7 +253,7 @@ int main(void)
 
     vec3 ab = b - a;
     vec3 ac = c - a;
-    vec3 norm = unit_vector(cross(ab, ac));
+    vec3 norm = unit_vector(cross(ac, ab));
 
     //encode norm x
     host_VertexBuffer[i + 3] = norm.x();
@@ -386,27 +307,25 @@ int main(void)
 
   // Create a shader using my GLSLObject class
   sivelab::GLSLObject shader;
-  shader.addShader("vertexShader_prepForPerFragment.glsl", sivelab::GLSLObject::VERTEX_SHADER);
-  shader.addShader("fragment_prepForPerFragment.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
+  shader.addShader("vertexShader_withPhongExp.glsl", sivelab::GLSLObject::VERTEX_SHADER);
+  shader.addShader("fragmentShader_withPhong.glsl", sivelab::GLSLObject::FRAGMENT_SHADER);
   shader.createProgram();
 
-  GLuint projMatrixID, viewMatrixID, modelMatrixID, normalMatrixID, light, diffuseComponentID;
+  GLuint projMatrixID, viewMatrixID, modelMatrixID, normalMatrixID, light, diffuseComponentID, specularID, PhongExponentID, cameraPos;
   projMatrixID = shader.createUniform("projMatrix");
   viewMatrixID = shader.createUniform("viewMatrix");
   modelMatrixID = shader.createUniform("modelMatrix");
   normalMatrixID = shader.createUniform("normalMatrix");
   diffuseComponentID = shader.createUniform("diffuseComponent");
+  specularID = shader.createUniform("specularComponent");
+  PhongExponentID = shader.createUniform("phongExponent");
+  cameraPos = shader.createUniform("cameraPosWorld");
 
   light = shader.createUniform("lightPosWorld");
 
   glm::mat4 modelTransform = glm::mat4(1.0);
-  float t = glfwGetTime();
-    glm::vec4 lightPos = glm::vec4(
-      3.0f * cos(t),
-      2.0f,
-      3.0f * sin(t),
-        1);
-  glm::vec3 diffuseComponentColor = glm::vec3(.5, .1, .75);
+ 
+  glm::vec3 diffuseComponentColor = glm::vec3(.5, .1, .05);
   // modelTransform = glm::translate(modelTransform, glm::vec3(0.0f, 1.0f, 0.0f));
   float rot = 0;
   modelTransform = glm::rotate(modelTransform, rot, glm::vec3(0, 1, 0));
@@ -447,14 +366,22 @@ int main(void)
     /* Render your objects here */
     shader.activate();
 
-
+     float t = glfwGetTime();
+    glm::vec4 lightPos = glm::vec4(
+      2.0f * cos(t),
+      1.0f,
+      2.0f * sin(t),
+      1); //Spinning light
 
     modelTransform = glm::mat4(1.0);
     modelTransform = glm::rotate(modelTransform, rotAngle, glm::vec3(0, 1, 0));
     normalMtrx = glm::transpose(glm::inverse(modelTransform)); //M^t^-1
-    rotAngle += 0.0005;
+    rotAngle += 0.0005; //This controls how fast things spin
     if (rotAngle > 2.0 * 3.14159) rotAngle = 0.0f;
     
+    float phongExp = 1.0f;
+    glm::vec3 specularColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    glUniform3fv(specularID, 1, glm::value_ptr(specularColor));
 
     // pass in the new camera matrix and the projection matrix
     glUniformMatrix4fv(projMatrixID, 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
@@ -463,6 +390,8 @@ int main(void)
     glUniformMatrix4fv(normalMatrixID, 1, GL_FALSE, glm::value_ptr(normalMtrx));
     glUniform4fv(light, 1, glm::value_ptr(lightPos));
     glUniform3fv(diffuseComponentID, 1, glm::value_ptr(diffuseComponentColor));
+    glUniform1f(PhongExponentID, phongExp);
+    glUniform3fv(cameraPos, 1, glm::value_ptr(cam.getPosition()));
 
     glBindVertexArray(m_VAO);
     glDrawArrays(GL_TRIANGLES, 0, numTriangles); //numTriangles dynamically renders based on the number of triangles in VBO
