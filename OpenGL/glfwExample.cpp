@@ -329,6 +329,7 @@ int main(void)
   };
 
   std::vector<float> temp_VertexBuffer = {};
+  std::vector<float> temp_VertexBufferTotalObjects = host_VertexBuffer;
 
   vec3 avgPt(0.0f, 0.0f, 0.0f);
   for (int j = 0; j < host_VertexBuffer.size(); j+=6) {
@@ -337,7 +338,7 @@ int main(void)
   avgPt = avgPt / (host_VertexBuffer.size() / 6);
   float rad = sqrt(pow((avgPt.x() - host_VertexBuffer[0]), 2) + pow((avgPt.y() - host_VertexBuffer[1]), 2) + pow((avgPt.z() - host_VertexBuffer[2]), 2));
 
-  for (int i = 0; i < 5; i++) { //Edit the i for number of recursiouns
+  for (int i = 0; i < 6; i++) { //Edit the i for number of recursiouns
       for (int j = 0; j < host_VertexBuffer.size(); j+=18) {
           //find midpoints
         vec3 A(host_VertexBuffer[j], host_VertexBuffer[j + 1], host_VertexBuffer[j + 2]);
@@ -447,8 +448,12 @@ int main(void)
         temp_VertexBuffer.push_back(0.0);
 
       }
+      for (int j = 0; j < temp_VertexBuffer.size(); j++) {
+        temp_VertexBufferTotalObjects.push_back(temp_VertexBuffer[j] + i*2 + 2);
+      }
       host_VertexBuffer = temp_VertexBuffer;
   }
+  host_VertexBuffer = temp_VertexBufferTotalObjects;
 
   //host_VertexBuffer = temp_VertexBuffer;
 
@@ -509,12 +514,13 @@ int main(void)
   // (Position of the vertex)
 
   glEnableVertexAttribArray(0);// enable attrib 0 - Vertex Position
-  glEnableVertexAttribArray(1);// enable attrib 1 - Vertex color
-  //glEnableVertexAttribArray(2);// enable attrib 1 - Vertex color
+  glEnableVertexAttribArray(1);// enable attrib 1 - normals
+  //glEnableVertexAttribArray(2);// enable attrib 1 - vertex color
 
   glBindBuffer(GL_ARRAY_BUFFER, m_triangleVBO[0]);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (const GLvoid *)12);// normal
+  //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), (const GLvoid *)12);// normal
   glBindVertexArray(0);
 
   // Create a shader using my GLSLObject class
@@ -580,9 +586,9 @@ int main(void)
 
      float t = glfwGetTime();
     glm::vec4 lightPos = glm::vec4(
-      2.0f * cos(t),
-      1.0f,
-      2.0f * sin(t),
+      4.0f * cos(t),
+      3.0f,
+      4.0f * sin(t),
       1); //Spinning light
 
     modelTransform = glm::mat4(1.0);
