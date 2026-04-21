@@ -584,12 +584,22 @@ int main(void)
     /* Render your objects here */
     shader.activate();
 
+    glm::vec4 lightPos = glm::vec4(
+      -5.0f,
+      0.0f,
+      -2.0f,
+      1);
+
+
+    // light block via chatGPT, spinning effect, very cool to play with
+    /*
      float t = glfwGetTime();
     glm::vec4 lightPos = glm::vec4(
       4.0f * cos(t),
       3.0f,
       4.0f * sin(t),
       1); //Spinning light
+      */
 
     modelTransform = glm::mat4(1.0);
     modelTransform = glm::rotate(modelTransform, rotAngle, glm::vec3(0, 1, 0));

@@ -21,8 +21,25 @@ Having a shape declaration like this,
  Will result in no shader being rendered and the object color to be returned. 
 
 
+ OPEN GL SECTION BELOW!!!
 
+ NOTE: pw_refactor is the 'main' branch, I have not yet swapped everything over and merged back
 
+ This openGL project is ran entirely inside of glfwExample.cpp. As of the last commit, the creative rendering is what will be loaded and ran. It shows the progression
+ of shapes are the edges are pushed outward to make spheres starting with a cube. They will appear in a line and spin. They are coded to be lambertian with the 
+ fragment_prepForPerFegament.glsl and vertexShader_prepForPerFragment.glsl. There is a spinning light block beneath the lightPos declaration I made that came 
+ from ChatGPT, it's fun to play with and makes some of the scenes look really cool. 
+
+ The Blinn-Phong does not really work for this program. It gets close, there is specularity but it turns all objects black and white. I don't know how to fix it
+ and at this point, this project is really late so I did not complete it. It can be ran by ysubg fragmentShader_withPhong.glsl and vertexShader_withPhoneExp.glsl. 
+
+ The shader files, on my machine, had to be placed inside my build folder, however, I think you could rig it to run by "../../...../shaderName". It was a little 
+ inconvenient to have to manually place them in the build folder after each update and every time I deleted the cache and rebuilt. 
+
+ The difference in rendering between the ray tracer and OpenGL, at least in my case, is I think the circles look much smoother in my ray tracer. I believe that is 
+ due to anti-aliasing and sampling with every pixel that gives it an even look because the colors are blended. There are also no shadows on other objects in OpenGL. 
+ The cube->circle progression mentioned above should have shadows on different objects, but they do not. (see the images folder for the ray tracer images as well as
+ OpenGL images).
 
 
 

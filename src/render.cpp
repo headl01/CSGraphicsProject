@@ -103,19 +103,19 @@ int main(int argc, char *argv[])
     //vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
  
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  shapes.push_back(std::make_shared<Sphere>(s1));
+  //shapes.push_back(std::make_shared<Sphere>(s1));
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
   Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
 
-  Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 0, 0, 100 }, "lambertian");
+  Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 100, 0, 100 }, "lambertian");
   
  //shapes.push_back(std::make_shared<Sphere>(s2));
  shapes.push_back(std::make_shared<Sphere>(s));
 
- shapes.push_back(std::make_shared<Sphere>(s3));
+ //shapes.push_back(std::make_shared<Sphere>(s3));
 
  Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "lambertian");
- shapes.push_back(std::make_shared<Sphere>(ground));
+ //shapes.push_back(std::make_shared<Sphere>(ground));
 
 
   fb.clearToColor(vec3{ 0, 0, 175 });
