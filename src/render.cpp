@@ -105,7 +105,10 @@ int main(int argc, char *argv[])
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
   //shapes.push_back(std::make_shared<Sphere>(s1));
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+  Sphere s(vec3{ 10.0, 0.0, -305.0 }, 10, vec3{ 0, 25, 100 }, "lambertian");
+
+  Sphere glassSphere(vec3{ 0.0, 0.0, -25.0 }, 1.1, vec3{ 0, 25, 100 }, "glass");
+  shapes.push_back(std::make_shared<Sphere>(glassSphere));
 
   Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 100, 0, 100 }, "lambertian");
   

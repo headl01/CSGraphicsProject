@@ -39,7 +39,9 @@ Having a shape declaration like this,
  The difference in rendering between the ray tracer and OpenGL, at least in my case, is I think the circles look much smoother in my ray tracer. I believe that is 
  due to anti-aliasing and sampling with every pixel that gives it an even look because the colors are blended. There are also no shadows on other objects in OpenGL. 
  The cube->circle progression mentioned above should have shadows on different objects, but they do not. (see the images folder for the ray tracer images as well as
- OpenGL images).
+ OpenGL images).This is also due, in part to the facets created with each triangle thats created with the sphere in OpenGL.
+
+ Controls for the camera are WS control depth, AD makes the camera slide from side to side, and esc closes the window. 
 
 
 

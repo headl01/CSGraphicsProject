@@ -161,7 +161,27 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
         return 0.5 * vec3(N.x() + 1, N.y() + 1, N.z() + 1);
       }
     }
-  } else if (shader == "lambertian") {
+  } else if (shader == "glass") {
+    if (intersect(r, 0.001, t_max, tempHit)) {
+
+      
+      vec3 color = vec3(1.0, 1.0, 1.0);
+      vec3 hitPoint = r.at(tempHit.t);
+     
+      float refraction_index = 1.5;
+      vec3 N = unit_vector(hitPoint - center);
+
+      vec3 unit_direction = unit_vector(r.direction());
+      bool front_face = dot(unit_direction, N) < 0;
+      vec3 outward_normal = front_face ? N : -N;
+      float ri = front_face ? (1.0 / refraction_index) : refraction_index;
+
+      vec3 refracted = refract(unit_direction, outward_normal, ri);
+      return computeRayColor(ray(hitPoint + 0.001 * refracted, refracted), 
+          shapes, lights, recursions - 1);
+    }
+  }
+  else if (shader == "lambertian") {
     vec3 color = vec3(0, 0, 0);
 
     if (objectColor != vec3{ 0, 0, 0 }) {
