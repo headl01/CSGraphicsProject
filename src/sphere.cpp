@@ -126,15 +126,26 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
       ray shadowRay(closestHit.point + 0.001 * closestHit.normal, lightDir);
 
       HitStruct tempHit;
+      bool inShadow = false;
+
       for (const auto &shape : shapes) {
+        HitStruct tempHit;
 
         if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
-          if (shape->getShader() != "mirror") {
-            return vec3(0, 0, 0);// in shadow
+          if (shape->getShader() != "mirror" && shape->getShader() != "glass") {
+            inShadow = true;
+            break;
           }
         }
       }
+      if (inShadow) {
+        return vec3(0, 0, 0);
+      }
     }// loop checks to see if there are any shadow-casting objects between light sources
+
+    if (recursions <= 0){
+      return vec3(0, 0, 0);
+    }
 
     return closestHit.shape->getColor(r, lights, recursions-1, shapes);
   }
@@ -163,7 +174,7 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
     }
   } else if (shader == "glass") {
     if (intersect(r, 0.001, t_max, tempHit)) {
-
+      vec3 dir = vec3(0, 0, 0);
       
       vec3 color = vec3(1.0, 1.0, 1.0);
       vec3 hitPoint = r.at(tempHit.t);
@@ -176,8 +187,16 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       vec3 outward_normal = front_face ? N : -N;
       float ri = front_face ? (1.0 / refraction_index) : refraction_index;
 
-      vec3 refracted = refract(unit_direction, outward_normal, ri);
-      return computeRayColor(ray(hitPoint + 0.001 * refracted, refracted), 
+      float cos_theta = fmin(dot(-unit_direction, outward_normal), 1.0);
+      float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+
+      if (ri * sin_theta > 1.0) {
+        dir = reflect(unit_direction, N);
+      } else {
+        dir = refract(unit_direction, outward_normal, ri);
+      }
+
+      return computeRayColor(ray(hitPoint + 0.001 * dir, dir), 
           shapes, lights, recursions - 1);
     }
   }

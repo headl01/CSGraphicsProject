@@ -49,14 +49,14 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
       for (const auto &shape : shapes) {
         
         if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
-          if (shape->getShader() != "mirror") {
+          if (shape->getShader() != "mirror" && shape->getShader() != "glass") {
             return vec3(0, 0, 0);// in shadow
           }
         }
       }
     } //loop checks to see if there are any shadow-casting objects between light sources
 
-    return closestHit.shape->getColor(r, lights, 5, shapes);
+    return closestHit.shape->getColor(r, lights, 10, shapes);
   }
 
   // Background color
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
   //shapes.push_back(std::make_shared<Sphere>(s1));
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 10.0, 0.0, -305.0 }, 10, vec3{ 0, 25, 100 }, "lambertian");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 25, 100 }, "lambertian");
 
-  Sphere glassSphere(vec3{ 0.0, 0.0, -25.0 }, 1.1, vec3{ 0, 25, 100 }, "glass");
+  Sphere glassSphere(vec3{ 0.1, 0.0, -25.0 }, 2, vec3{ 0, 25, 100 }, "glass");
   shapes.push_back(std::make_shared<Sphere>(glassSphere));
 
   Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 100, 0, 100 }, "lambertian");
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
  //shapes.push_back(std::make_shared<Sphere>(s3));
 
  Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "lambertian");
- //shapes.push_back(std::make_shared<Sphere>(ground));
+ shapes.push_back(std::make_shared<Sphere>(ground));
 
 
   fb.clearToColor(vec3{ 0, 0, 175 });
