@@ -103,9 +103,10 @@ int main(int argc, char *argv[])
     //vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
  
   Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  //shapes.push_back(std::make_shared<Sphere>(s1));
+  shapes.push_back(std::make_shared<Sphere>(s1));
+
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 25, 100 }, "lambertian");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 25, 100 }, "mirror");
 
   Sphere glassSphere(vec3{ 0.1, 0.0, -25.0 }, 2, vec3{ 0, 25, 100 }, "glass");
   shapes.push_back(std::make_shared<Sphere>(glassSphere));
@@ -134,7 +135,9 @@ int main(int argc, char *argv[])
   //troublesome attempt at anti aliasing...
   
   int samplessqrd = 3;
-
+  int total = height * width;
+  int count = 0;
+  int percent = 0;
   float t;
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
@@ -163,7 +166,22 @@ int main(int argc, char *argv[])
 
         avgColor = clampToOne(avgColor);
 
+       
       fb.setPixelColor(x + y * width, avgColor);
+
+      count++;
+
+      double progress = (double)count / total * 100;
+
+      while ((int)progress >= percent && percent <= 100) {
+        std::cout << percent << "% completed out of 100" << std::endl;
+        if (percent <= 95) {
+          percent += 5;
+        } else {
+          percent++;
+        }
+      }
+        //std::cout << "Processed pixel: " << count << " out of " << total << std::endl;
     }
   }
 
