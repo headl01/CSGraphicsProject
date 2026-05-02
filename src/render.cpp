@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
    std::vector<std::shared_ptr<Shape>> shapes;
   // Red Triangle 1
-  //shapes.push_back(std::make_shared<Triangle>(vec3(30, 0, -500), vec3(800, -5, -500), vec3(9, 10, -500), vec3(1.0, 0.0, 0.0), ""));
+  //shapes.push_back(std::make_shared<Triangle>(vec3(30, 0, -500), vec3(800, -5, -500), vec3(9, 10, -500), vec3(1.0, 0.0, 0.0), "glass"));
 
   // Green Triangle 2
   //shapes.push_back(std::make_shared<Triangle>(
@@ -106,15 +106,18 @@ int main(int argc, char *argv[])
   shapes.push_back(std::make_shared<Sphere>(s1));
 
   Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 25, 100 }, "mirror");
+  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 25, 100 }, "basicCeramic");
 
-  Sphere glassSphere(vec3{ 0.1, 0.0, -25.0 }, 2, vec3{ 0, 25, 100 }, "glass");
+  Sphere s4(vec3{ -2.5, 3.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
+
+  Sphere glassSphere(vec3{ 0.0, 0.0, -25.0 }, 1.2, vec3{ 0, 25, 100 }, "glass");
   shapes.push_back(std::make_shared<Sphere>(glassSphere));
 
   Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 100, 0, 100 }, "lambertian");
   
  //shapes.push_back(std::make_shared<Sphere>(s2));
  shapes.push_back(std::make_shared<Sphere>(s));
+  shapes.push_back(std::make_shared<Sphere>(s4));
 
  //shapes.push_back(std::make_shared<Sphere>(s3));
 
@@ -123,16 +126,7 @@ int main(int argc, char *argv[])
 
 
   fb.clearToColor(vec3{ 0, 0, 175 });
- /*
-  float t;
-  for (int x = 0; x < width; x++) {
-    for (int y = 0; y < height; y++) {
-      ray r = p.generateRay(x, y);
-      fb.setPixelColor(y * width + x, computeRayColor(r, shapes, lights));
-    }
-  }
-  */
-  //troublesome attempt at anti aliasing...
+ 
   
   int samplessqrd = 3;
   int total = height * width;
@@ -175,7 +169,7 @@ int main(int argc, char *argv[])
 
       while ((int)progress >= percent && percent <= 100) {
         std::cout << percent << "% completed out of 100" << std::endl;
-        if (percent <= 95) {
+        if (percent < 95) {
           percent += 5;
         } else {
           percent++;

@@ -21,6 +21,10 @@ public:
 
   std::string getShader() const override { return shader;};
 
+  vec3 getObjColor() const override {
+    return objectColor;
+  };
+
 private:
   point3 center;
   double radius;

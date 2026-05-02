@@ -4,97 +4,6 @@
 #include <algorithm>
 #include <vector>
     
-/*
-  vec3 Sphere::ray_color(const ray &r, std::vector<point3> lights, std::vector<Sphere> objectList, int recursions)
-{
-    vec3 lightPos = point3(-25, 10, 0);
-    float t;
-
-    if (shader == "normal") {
-    
-      
-      if (objectColor != vec3{ 0, 0, 0 }) {
-        if (hit(r, 0.001, INFINITY, t)) {
-          vec3 hitPoint = r.at(t);
-
-          vec3 N = unit_vector(hitPoint - center);
-          return 0.5 * vec3(N.x() + 1, N.y() + 1, N.z() + 1);
-        }
-
-        vec3 unit_direction = unit_vector(r.direction());
-        auto a = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
-      }
-    }
-    else if (shader == "lambertian") {
-      vec3 color = vec3(0, 0, 0);
-
-        if (objectColor != vec3{0,0,0}) {
-            if (hit(r, 0.001, INFINITY, t)) {
-                vec3 hitPoint = r.at(t);
-                
-                vec3 N = unit_vector(hitPoint - center);
-                for (int i = 0; i < lights.size(); i++) {
-                  vec3 toLight = unit_vector(lights[i] - hitPoint);  
-                  float returnVector = (std::max(0.0, dot(N, toLight)));
-                  color = vec3{ color.x() + returnVector, color.y() + returnVector, color.z() + returnVector };
-                }
-              return clampToOne( color*unit_vector(objectColor));
-            }
-
-              vec3 unit_direction = unit_vector(r.direction());
-              auto a = 0.5 * (unit_direction.y() + 1.0);
-              return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
-          } //shader if color
-    } 
-    else if (shader == "Blinn-Phong") {
-        if (hit(r, 0.001, INFINITY, t)) {
-        float kd = 1.0f;
-        float ks = 0.6f;
-        float p = 32.0f;
-
-
-          vec3 hitPoint = r.at(t);
-
-          vec3 toLight = unit_vector(lightPos - hitPoint);
-          vec3 N = unit_vector(hitPoint - center);
-          vec3 V = unit_vector(r.origin()-hitPoint);
-          vec3 H = unit_vector(toLight + V);
-
-          //Diffuse
-          float diff = std::max(dot(N, toLight), 0.0);
-          vec3 diffuse = kd * diff * objectColor;
-
-          //specular
-          float spec = std::pow(std::max(0.0, dot(N, H)), p);
-          vec3 specular = ks * spec * vec3(1,1,1);
-
-          float colorSpec = spec * diff;
-
-          vec3 returnVector =clampToOne( clampToOne( diffuse ) + clampToOne(specular));
-          return returnVector;
-        }
-
-        vec3 unit_direction = unit_vector(r.direction());
-        auto a = 0.5 * (unit_direction.y() + 1.0);
-        return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
-    } else if (shader == "mirror") {
-      if (hit(r, 0.001, INFINITY, t)) {
-
-        vec3 N = unit_vector(r.at(t) - center);
-
-        vec3 D = unit_vector(r.direction());
-
-        vec3 reflection = D - 2 * dot(D, N) * N;
-
-        ray tempRay(r.at(t) + 0.001 * N, reflection);
-
-        return ray_color(tempRay, lights, objectList, recursions--);
-      }
-    
-    }
-}
-*/
 
 vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &shapes, std::vector<point3> lights, int recursions) {
   float t_min = 0.001f;
@@ -131,15 +40,16 @@ vec3 computeRayColor(const ray &r, const std::vector<std::shared_ptr<Shape>> &sh
       for (const auto &shape : shapes) {
         HitStruct tempHit;
 
-        if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
+        /* if (shape->intersect(shadowRay, 0.001, lightDist, tempHit)) {
           if (shape->getShader() != "mirror" && shape->getShader() != "glass") {
             inShadow = true;
+
             break;
           }
-        }
+        }*/
       }
       if (inShadow) {
-        return vec3(0, 0, 0);
+        //return shape->getObjcolor() * 0.3;
       }
     }// loop checks to see if there are any shadow-casting objects between light sources
 
@@ -175,8 +85,6 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
   } else if (shader == "glass") {
     if (intersect(r, 0.001, t_max, tempHit)) {
       vec3 dir = vec3(0, 0, 0);
-      
-      vec3 color = vec3(1.0, 1.0, 1.0);
       vec3 hitPoint = r.at(tempHit.t);
      
       float refraction_index = 1.5;
@@ -191,13 +99,28 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       float sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
       if (ri * sin_theta > 1.0) {
-        dir = reflect(unit_direction, N);
+        dir = reflect(unit_direction, outward_normal);
       } else {
         dir = refract(unit_direction, outward_normal, ri);
       }
+      float materialReflectivity = 0.04;
+      float fresnelFactor = materialReflectivity + (1.0 - materialReflectivity) * pow(1.0 - cos_theta, 5.0);
 
-      return computeRayColor(ray(hitPoint + 0.001 * dir, dir), 
-          shapes, lights, recursions - 1);
+      vec3 reflect_dir = reflect(unit_direction, outward_normal);
+      vec3 refract_dir = refract(unit_direction, outward_normal, ri);
+
+      vec3 reflected = computeRayColor(ray(hitPoint + 0.001 * reflect_dir, reflect_dir),
+        shapes,
+        lights,
+        recursions - 1);
+
+      vec3 refracted = computeRayColor(ray(hitPoint + 0.001 * refract_dir, refract_dir),
+        shapes,
+        lights,
+        recursions - 1);
+
+      return fresnelFactor * reflected + (1-fresnelFactor) * refracted;
+
     }
   }
   else if (shader == "lambertian") {
@@ -230,7 +153,8 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       vec3 V = unit_vector(-r.direction());
 
       vec3 N = unit_vector(tempHit.normal);
-      vec3 diffuse, specular;
+      vec3 diffuse = vec3(0, 0, 0);
+      vec3 specular = vec3(0, 0, 0);
 
       for (int i = 0; i < lights.size(); i++) {
         vec3 toLight = unit_vector(lights[i] - hitPoint);
@@ -269,6 +193,39 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
       auto a = 0.5 * (unit_direction.y() + 1.0);
       return (1.0 - a) * vec3(1.0, 1.0, 1.0) + a * vec3(0.5, 0.7, 1.0);
     }
+  } else if (shader == "basicCeramic") {
+    float randColorMod = (float)(rand()) / (float)(RAND_MAX) * 0.15;
+    //std::cout << objectColor.z();
+    float kd = 1.0f;
+    float ks = 0.2f;
+    float p = 32.0f;
+    vec3 hitPoint = r.at(tempHit.t);
+    vec3 V = unit_vector(-r.direction());
+
+    vec3 N = unit_vector(tempHit.normal);
+    vec3 diffuse = vec3(0, 0, 0);
+    vec3 specular = vec3(0, 0, 0);
+
+    vec3 modifiedObjectColor = (objectColor/256)+vec3(randColorMod, randColorMod, randColorMod);
+    vec3 ambient = 0.1f * modifiedObjectColor;
+
+    for (int i = 0; i < lights.size(); i++) {
+      vec3 toLight = unit_vector(lights[i] - hitPoint);
+
+      vec3 H = unit_vector(toLight + V);
+      // Diffuse
+      float diff = std::max(dot(N, toLight), 0.0);
+      diffuse += kd * diff * objectColor;
+
+      // specular
+      float spec = std::pow(std::max(0.0, dot(N, H)), p);
+      specular += ks * spec * vec3(1, 1, 1);
+
+    }
+
+
+    vec3 returnVector = clampToOne(diffuse + specular + ambient);
+    return modifiedObjectColor;
   }
   return objectColor;
 } 
@@ -327,3 +284,5 @@ vec3 Sphere::getColor(ray r, std::vector<point3> lights, int recursions, std::ve
 
   return false;
 }
+
+  
