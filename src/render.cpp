@@ -102,30 +102,36 @@ int main(int argc, char *argv[])
   //shapes.push_back(std::make_shared<Triangle>(
     //vec3(0.426795, 1.13923, -7), vec3(-0.833013, -0.44282, -5), vec3(-0.45, -0.779423, -5), vec3(0.0, 0.0, 1.0)));
  
-  Sphere s1(vec3{ 2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  shapes.push_back(std::make_shared<Sphere>(s1));
+   Sphere cue(vec3{ -1.0, 0.03, -20.0 }, 0.6, vec3{ 250, 250, 227 }, "basicCeramic");
+   shapes.push_back(std::make_shared<Sphere>(cue));
+   Sphere glassCueBall(vec3{ -1.0, 0.03, -20.0 }, 0.7, vec3{ 0, 25, 100 }, "glass");
+   shapes.push_back(std::make_shared<Sphere>(glassCueBall));
+   Sphere blue1(vec3{ 1.0, 0.0, -35.0 }, 0.6, vec3{ 0, 0, 227 }, "basicCeramic");
+   shapes.push_back(std::make_shared<Sphere>(blue1));
+   Sphere glassblue1(vec3{ 1.0, 0.0, -35.0 }, 0.7, vec3{ 0, 25, 100 }, "glass");
+   shapes.push_back(std::make_shared<Sphere>(glassblue1));
+   Sphere red1(vec3{ 2.5, 0.0, -35.0 }, 0.6, vec3{ 102, 0, 23 }, "basicCeramic");
+   shapes.push_back(std::make_shared<Sphere>(red1));
+   Sphere glassRed1(vec3{ 2.5, 0.0, -35.0 }, 0.7, vec3{ 0, 25, 100 }, "glass");
+   shapes.push_back(std::make_shared<Sphere>(glassRed1));
+   Sphere orange1(vec3{ 2.5, 0.450, -30.0 }, 0.2, vec3{ 204, 85, 0 }, "basicCeramic");
+   shapes.push_back(std::make_shared<Sphere>(orange1));
+   Sphere glassorange1(vec3{ 2.5, 0.450, -30.0 }, 0.3, vec3{ 0, 25, 100 }, "glass");
+   shapes.push_back(std::make_shared<Sphere>(glassorange1));
+   Sphere blue2(vec3{ 3.5, 0.45, -30.0 }, 0.2, vec3{ 4, 4, 100 }, "basicCeramic");
+   shapes.push_back(std::make_shared<Sphere>(blue2));
+   Sphere glassblue2(vec3{ 3.5, 0.450, -30.0 }, 0.3, vec3{ 0, 25, 100 }, "glass");
+   shapes.push_back(std::make_shared<Sphere>(glassblue2));
 
-  Sphere s2(vec3{ -2.5, 0.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "mirror");
-  Sphere s(vec3{ 0.0, 0.0, -25.0 }, 1, vec3{ 0, 25, 100 }, "basicCeramic");
-
-  Sphere s4(vec3{ -2.5, 3.0, -30.0 }, 1, vec3{ 0, 0, 100 }, "lambertian");
-
-  Sphere glassSphere(vec3{ 0.0, 0.0, -25.0 }, 1.2, vec3{ 0, 25, 100 }, "glass");
-  shapes.push_back(std::make_shared<Sphere>(glassSphere));
-
-  Sphere s3(vec3{ 0.0, -1000.0, 0 }, 980, vec3{ 100, 0, 100 }, "lambertian");
-  
- //shapes.push_back(std::make_shared<Sphere>(s2));
- shapes.push_back(std::make_shared<Sphere>(s));
-  shapes.push_back(std::make_shared<Sphere>(s4));
-
- //shapes.push_back(std::make_shared<Sphere>(s3));
-
- Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1000, vec3{ 0.5, 0.5, 0.5 }, "lambertian");
+ Sphere ground(vec3{ 0.0, 1003.0, -30.0 }, 1002.265, vec3{ 1, 109, 8 }, "lambertian");
  shapes.push_back(std::make_shared<Sphere>(ground));
 
+ Sphere background(vec3{ 0.0, 1003.0, -30000.0 }, 10000, vec3{ 116, 32, 63 }, "lambertian");
+ shapes.push_back(std::make_shared<Sphere>(background));
+ Sphere ceiling(vec3{ 0.0, -1053.0, -30.0 }, 1005, vec3{ 25, 25, 25 }, "basicCeramic");
+ shapes.push_back(std::make_shared<Sphere>(ceiling));
 
-  fb.clearToColor(vec3{ 0, 0, 175 });
+  fb.clearToColor(vec3{ 116, 32, 63 });
  
   
   int samplessqrd = 3;
